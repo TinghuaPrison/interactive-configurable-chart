@@ -10,6 +10,16 @@ var order = {
     value: 0
 }; //排序方式：默认
 
+var show = {
+    histogram: true,
+    line: true
+};
+
+var hide = {
+    histogram: false,
+    line: false
+}
+
 var origin_point_x; //坐标轴原点x
 var origin_point_y;//坐标轴原点y
 var end_point_y_axis;//y轴的端点
@@ -18,8 +28,8 @@ var end_point_x_axis;//x轴的断电
 //保存柱状图之前的样式
 var style_before = {
     solid: null,
-    color1: null,
-    color2: null,
+    color1: "rgb(18, 179, 138)",
+    color2: "rgb(217, 236, 232)",
     pattern: null,
 };
 
@@ -460,6 +470,8 @@ function histogram_style(hide, solid, gradient, pattern, before) {
     //隐藏柱状图
     if (hide == true) {
 
+        //show.histogram = false;
+
         //重绘背景
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "#e5f7ff"; // 设置Canvas背景颜色为白色
@@ -470,11 +482,13 @@ function histogram_style(hide, solid, gradient, pattern, before) {
         paint_x_axis();
 
         //重绘折状图
-
+        paint_line_chart();
+        return;
     }
 
-
     else {
+        //if (!show.histogram) {
+        show.histogram = true;
 
         //单色
         if (solid != null) {
@@ -542,6 +556,8 @@ function resize() {
 var hide_histogram = document.getElementById("hide_histogram");
 hide_histogram.onclick = function () {
     //console.log(hide_histogram.checked);
+    //if (!show.histogram)
+    hide.histogram = hide_histogram.checked;
     histogram_style(hide_histogram.checked, null, null, null, style_before);
 }
 
@@ -662,6 +678,8 @@ function paint_line_chart() {
         coor_x += margin_left;
 
         ctx.beginPath();
+        //http://caibaojian.com/html5-canvas-arc.html
+        //https://blog.csdn.net/Jacgu/article/details/106378627
         ctx.arc(coor_x + data_width / 2, origin_point_y - data_height - 40, 5, 0, 2 * Math.PI);
         ctx.fillStyle = "blue";
         ctx.fill();
@@ -701,33 +719,6 @@ function main() {
     //console.log(year);
     //console.log(value);
 
-    /* //原始
-    if (order.value == 0) {
-        value = origin_value;
-        year = origin_year;
-
-        if (year.value == 1) {
-            insertionSort_ascending(year, value);
-        }
-
-        else (year.value == 2)
-        {
-            insertionSort_descending(year, value);
-        }
-    }
-
-    //升序
-    if (order.value == 1) {
-        var sorted = insertionSort_ascending(value, year);
-    }
-
-    //降序
-    else if (order.value == 2) {
-        var sorted = insertionSort_descending(value, year);
-    }
-
-    order.value = 0; */
-
     result = count();
     resize();
     paint_y_axis();
@@ -745,7 +736,8 @@ function main() {
         paint_x_axis();
     }
 
-    paint_histogram(null, null, null, null, true, true);
+    //paint_histogram(null, null, null, null, true, true);
+    histogram_style(null, null, null, null, true);
     paint_line_chart();
 }
 
@@ -760,25 +752,37 @@ for (var i = 0; i < valueOrderType.length; i++) {
             valueOrderType[j].checked = false;
         this.checked = true;
 
-        origin_value = JSON.parse(localStorage.getItem('value'));
-        origin_year = JSON.parse(localStorage.getItem('year'));
-        var type = this.getAttribute("id");
+        //按年排序的勾选框全部置为空
+        var yearOrderType = document.querySelectorAll('.year_order input');
+        for (var j = 0; j < yearOrderType.length; j++)
+            yearOrderType[j].checked = false;
 
+        var type = this.getAttribute("id");
+        show.histogram = true;
+
+        //默认
         if (type == "value_original") {
             order.value = 0;
             value = origin_value;
             year = origin_year;
         }
+
+        //升序
         else if (type == "value_ascending") {
             order.value = 1;
             var sorted = insertionSort_ascending(value, year);
         }
+
+        //降序
         else if (type == "value_descending") {
             order.value = 2;
             var sorted = insertionSort_descending(value, year);
         }
 
         main();
+        if (hide.histogram) {
+            histogram_style(true, null, null, null, true);
+        }
         order.value = 0;
     })
 }
@@ -792,21 +796,37 @@ for (var i = 0; i < yearOrderType.length; i++) {
             yearOrderType[j].checked = false;
         this.checked = true;
 
-        var type = this.getAttribute("id");
+        //按产量序的勾选框全部置为空
+        var valueOrderType = document.querySelectorAll('.value_order input');
+        for (var j = 0; j < valueOrderType.length; j++)
+            valueOrderType[j].checked = false;
 
+        var type = this.getAttribute("id");
+        show.histogram = true;
+
+        //默认
         if (type == "year_original") {
             order.year = 0; value = origin_value;
             year = origin_year;
         }
+
+        //升序
         else if (type == "year_ascending") {
             order.year = 1;
             var sorted = insertionSort_ascending(year, value);
         }
+
+        //降序
         else if (type == "year_descending") {
-            order.year = 2; var sorted = insertionSort_descending(year, value);
+            order.year = 2;
+            var sorted = insertionSort_descending(year, value);
         }
 
         main();
+
+        if (hide.histogram) {
+            histogram_style(true, null, null, null, true);
+        }
         order.year = 0;
     })
 }
