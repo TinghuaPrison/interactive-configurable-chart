@@ -5,7 +5,10 @@ var min;    //数据中的最大值
 var max;    //数据中的最小值
 var n; //数据个数
 var N_tick = 5;//间隔个数
-var order = 0; //排序方式：默认
+var order = {
+    year: 0,
+    value: 0
+}; //排序方式：默认
 
 var origin_point_x; //坐标轴原点x
 var origin_point_y;//坐标轴原点y
@@ -627,6 +630,68 @@ pattern_img.addEventListener("change", function () {
 
 })
  */
+function count_proportion() {
+    var prop = [];
+    var sum = 0;
+
+    for (var i = 0; i < value.length; i++)
+        sum += parseFloat(value[i]);
+
+    for (var i = 0; i < value.length; i++) {
+        prop.push((sum / parseFloat(value[i])).toFixed(2));
+    }
+
+    //console.log(prop);
+    return prop;
+}
+
+function paint_line_chart() {
+    var margin_left = 20;
+    var margin_right = 20;
+    var data_width = 50;
+    var coor_x = origin_point_x;
+    var coor_y = origin_point_y;
+
+    var coor = [];
+
+    //先绘制圆圈
+    for (var i = 0; i < n; i++) {
+
+        //计算矩形高度
+        var data_height = (value[i] - result[0]) * ((origin_point_y - end_point_y_axis) / (result[1] - result[0]));
+        coor_x += margin_left;
+
+        ctx.beginPath();
+        ctx.arc(coor_x + data_width / 2, origin_point_y - data_height - 40, 5, 0, 2 * Math.PI);
+        ctx.fillStyle = "blue";
+        ctx.fill();
+        coor.push({ x: coor_x + data_width / 2, y: origin_point_y - data_height - 40 });
+
+        //递增
+        coor_x += (data_width + margin_right);
+    }
+
+
+    //console.log(coor);
+
+    //绘制折线
+    ctx.fillStyle = 'black';
+    for (var i = 0; i < coor.length - 1; i++) {
+        ctx.beginPath();
+        ctx.moveTo(coor[i].x, coor[i].y);
+        ctx.lineTo(coor[i + 1].x, coor[i + 1].y);
+        ctx.stroke();
+    }
+
+    //绘制占比
+    var proportion = count_proportion();
+    for (var i = 0; i < value.length; i++) {
+        ctx.font = "16px serif";
+        ctx.fillText(proportion[i].toString() + '%', coor[i].x, coor[i].y - 20);
+    }
+}
+
+
 
 function main() {
 
@@ -636,21 +701,32 @@ function main() {
     //console.log(year);
     //console.log(value);
 
-    //原始
-    if (order == 0) {
+    /* //原始
+    if (order.value == 0) {
         value = origin_value;
         year = origin_year;
+
+        if (year.value == 1) {
+            insertionSort_ascending(year, value);
+        }
+
+        else (year.value == 2)
+        {
+            insertionSort_descending(year, value);
+        }
     }
 
     //升序
-    if (order == 1) {
+    if (order.value == 1) {
         var sorted = insertionSort_ascending(value, year);
     }
 
     //降序
-    else if (order == 2) {
+    else if (order.value == 2) {
         var sorted = insertionSort_descending(value, year);
     }
+
+    order.value = 0; */
 
     result = count();
     resize();
@@ -670,27 +746,67 @@ function main() {
     }
 
     paint_histogram(null, null, null, null, true, true);
+    paint_line_chart();
 }
 
 main();
 
-//柱状图的排序
-var orderType = document.querySelectorAll('.order input');
-for (var i = 0; i < orderType.length; i++) {
-    orderType[i].addEventListener('click', function () {
+//柱状图产量的排序
+var valueOrderType = document.querySelectorAll('.value_order input');
+for (var i = 0; i < valueOrderType.length; i++) {
+    valueOrderType[i].addEventListener('click', function () {
 
-        for (var j = 0; j < orderType.length; j++)
-            orderType[j].checked = false;
+        for (var j = 0; j < valueOrderType.length; j++)
+            valueOrderType[j].checked = false;
+        this.checked = true;
+
+        origin_value = JSON.parse(localStorage.getItem('value'));
+        origin_year = JSON.parse(localStorage.getItem('year'));
+        var type = this.getAttribute("id");
+
+        if (type == "value_original") {
+            order.value = 0;
+            value = origin_value;
+            year = origin_year;
+        }
+        else if (type == "value_ascending") {
+            order.value = 1;
+            var sorted = insertionSort_ascending(value, year);
+        }
+        else if (type == "value_descending") {
+            order.value = 2;
+            var sorted = insertionSort_descending(value, year);
+        }
+
+        main();
+        order.value = 0;
+    })
+}
+
+//柱状图年份的排序
+var yearOrderType = document.querySelectorAll('.year_order input');
+for (var i = 0; i < yearOrderType.length; i++) {
+    yearOrderType[i].addEventListener('click', function () {
+
+        for (var j = 0; j < yearOrderType.length; j++)
+            yearOrderType[j].checked = false;
         this.checked = true;
 
         var type = this.getAttribute("id");
 
-        if (type == "original")
-            order = 0;
-        else if (type == "ascending")
-            order = 1;
-        else if (type == "descending")
-            order = 2;
+        if (type == "year_original") {
+            order.year = 0; value = origin_value;
+            year = origin_year;
+        }
+        else if (type == "year_ascending") {
+            order.year = 1;
+            var sorted = insertionSort_ascending(year, value);
+        }
+        else if (type == "year_descending") {
+            order.year = 2; var sorted = insertionSort_descending(year, value);
+        }
+
         main();
+        order.year = 0;
     })
 }
