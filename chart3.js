@@ -39,6 +39,7 @@ var year = [2013, 2014, 2015, 2016, 2017, 2018, 2019];//年份
 var origin_value; //原始数据
 var origin_year; //原始数据
 
+
 //https://juejin.cn/post/7033761580214911007
 function partition(arr1, arr2, low, high) {
     let pivot = parseFloat(arr1[low]);
@@ -465,10 +466,11 @@ function paint_histogram(solid, gradient, pattern, before, shadow, show_num_labe
 }
 
 //先选择样式再绘画的接口
-function histogram_style(hide, solid, gradient, pattern, before) {
+function histogram_style(_hide, solid, gradient, pattern, before) {
+
 
     //隐藏柱状图
-    if (hide == true) {
+    if (_hide == true) {
 
         //show.histogram = false;
 
@@ -484,11 +486,12 @@ function histogram_style(hide, solid, gradient, pattern, before) {
         //重绘折状图
         paint_line_chart();
         return;
+
     }
 
     else {
         //if (!show.histogram) {
-        show.histogram = true;
+        //show.histogram = true;
 
         //单色
         if (solid != null) {
@@ -508,24 +511,30 @@ function histogram_style(hide, solid, gradient, pattern, before) {
 
         //纹理样式
         else if (pattern != null) {
-
             //https://www.twle.cn/l/yufei/canvas/canvas-basic-pattern.html
             var img = new Image();
             img.src = pattern.img;
 
+
             //加载好了才绘柱状图
             img.onload = function () {
+                //if (hide.histogram == false)
+
                 paint_histogram(null, null, pattern, null, false, false);
             };
+
         }
 
         //恢复之前的样式
         else if (before != null) {
+
             if (style_before.pattern != null) {
                 var img = new Image();
                 img.src = style_before.pattern.img;
+
                 img.onload = function () {
-                    paint_histogram(null, null, null, before, true, true);
+                    if (hide.histogram == false)
+                        paint_histogram(null, null, null, before, true, true);
                 };
             }
 
@@ -689,7 +698,6 @@ function paint_line_chart() {
         coor_x += (data_width + margin_right);
     }
 
-
     //console.log(coor);
 
     //绘制折线
@@ -737,11 +745,12 @@ function main() {
     }
 
     //paint_histogram(null, null, null, null, true, true);
-    histogram_style(null, null, null, null, true);
+    histogram_style(false, null, null, null, true);
     paint_line_chart();
 }
 
 main();
+
 
 //柱状图产量的排序
 var valueOrderType = document.querySelectorAll('.value_order input');
@@ -758,7 +767,6 @@ for (var i = 0; i < valueOrderType.length; i++) {
             yearOrderType[j].checked = false;
 
         var type = this.getAttribute("id");
-        show.histogram = true;
 
         //默认
         if (type == "value_original") {
@@ -779,9 +787,12 @@ for (var i = 0; i < valueOrderType.length; i++) {
             var sorted = insertionSort_descending(value, year);
         }
 
-        main();
+
         if (hide.histogram) {
-            histogram_style(true, null, null, null, true);
+            histogram_style(true, null, null, null, null);
+        }
+        else {
+            main();
         }
         order.value = 0;
     })
@@ -802,7 +813,6 @@ for (var i = 0; i < yearOrderType.length; i++) {
             valueOrderType[j].checked = false;
 
         var type = this.getAttribute("id");
-        show.histogram = true;
 
         //默认
         if (type == "year_original") {
@@ -822,10 +832,13 @@ for (var i = 0; i < yearOrderType.length; i++) {
             var sorted = insertionSort_descending(year, value);
         }
 
-        main();
+
 
         if (hide.histogram) {
-            histogram_style(true, null, null, null, true);
+            histogram_style(true, null, null, null, null);
+        }
+        else {
+            main();
         }
         order.year = 0;
     })
