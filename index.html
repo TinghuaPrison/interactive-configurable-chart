@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Canvas绘制坐标轴</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!--  <canvas id="myCanvas"></canvas> -->
+    <canvas id="myCanvas" width="1000" height="1300"></canvas>
+
+    <div class="data">
+
+    </div>
+
+    <div class="histogram_style">
+        <div class="title">柱状图样式设置</div>
+        <div class="hide">
+            <input type="checkbox" name="hide_histogram" id="hide_histogram">
+            <label for="hide_histogram">隐藏柱状图</label>
+        </div>
+        <div class="checkbox_style">
+            <input type="checkbox" name="solid" id="solid">
+            <label for="solid">单色</label>
+            <input type="color" id="solid_color">
+        </div>
+        <div class="checkbox_style">
+            <input type="checkbox" name="gradient" id="gradient">
+            <label for="gradient">渐变</label>
+            <input type="color" id="grd_color1">
+            <input type="color" id="grd_color2">
+        </div>
+        <div class="checkbox_style">
+            <input type="checkbox" name="pattern" id="pattern">
+            <label for="pattern">样式</label>
+
+        </div>
+        <input type="file" name="pattern_img" id="pattern_img" value="选择文件">
+
+        <div class="checkbox_style">
+            <input type="checkbox" name="default" id="default">
+            <label for="default">默认</label>
+        </div>
+
+        <div class="set_histogram_style">
+            <input type="submit" value="设置" id="submit_histogram_style">
+        </div>
+
+    </div>
+
+    <div class="order">
+        <input type="checkbox" name="original" id="original">
+        <label for="original">默认</label>
+        <input type="checkbox" name="ascending" id="ascending">
+        <label for="ascending">升序</label>
+        <input type="checkbox" name="descending" id="descending">
+        <label for="descending">降序</label>
+    </div>
+
+    <script type="text/javascript" src="chart3.js">
+
+        var canvas = document.getElementById('myCanvas');
+        var ctx = canvas.getContext('2d');
+
+    </script>
+</body>
+
+</html>

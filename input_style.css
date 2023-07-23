@@ -1,0 +1,82 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    position: relative;
+}
+
+.input {
+    position: absolute;
+    width: 240px;
+    height: 100px;
+    margin-left: 50px;
+    margin-top: 50px;
+    background-color: antiquewhite;
+}
+
+.input span {
+    display: block;
+    width: 130px;
+    height: 30px;
+    /* margin-left: 20px;
+    margin-top: 10px; */
+    margin: 10px 0px 0px 20px;
+
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.input #input_year,
+.input #input_value {
+    margin: 0px 0px 5px 20px;
+}
+
+.produce {
+    position: absolute;
+    top: 50px;
+    left: 300px;
+    width: 240px;
+    height: 100px;
+    background-color: antiquewhite;
+}
+
+#get_chart {
+    position: absolute;
+    top: 10px;
+    left: 20px;
+}
+
+#clear_data {
+    position: absolute;
+    top: 40px;
+    left: 20px;
+}
+
+table {
+    position: absolute;
+    top: 100px;
+    left: 50PX;
+    width: 500px;
+    margin: 100px auto;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+
+th {
+    /* height: 30px; */
+    border: 2px solid #333;
+}
+
+td {
+    height: 40px;
+    background-color: #fff;
+    border: 2px solid #333;
+}
+
+thead tr {
+    height: 40px;
+    background-color: #ccc;
+}

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Canvas绘制坐标轴</title>
+    <link rel="stylesheet" href="input_style.css">
+</head>
+
+<!-- https://www.bilibili.com/video/BV1Sy4y1C7ha?p=238&vd_source=242881c2e0028b99f5965425eaeee832 -->
+<!--https://www.cnblogs.com/liyihua/p/12393342.html  -->
+<!--  -->
+<!--  -->
+
+<body>
+    <div class="input">
+        <span>新增数据</span>
+        <input type="text" id="input_year" placeholder="年份">
+        <input type="number" id="input_value" placeholder="产量">
+        <input type="submit" id="insert" value=" 添加 ">
+    </div>
+
+    <div class="produce">
+        <input type="submit" id="get_chart" value=" 生成图表 ">
+        <input type="submit" id="clear_data" value=" 清空表单数据 ">
+    </div>
+
+
+    <table cellspacing="0">
+        <thead>
+            <tr>
+                <th>年份</th>
+                <th>产量</th>
+                <th>操作</th>
+            </tr>
+            <tr>
+                <td>2019</td>
+                <td>2</td>
+                <td><a href="javascript:void(0);" onclick="deleteTr(this);">删除</a></td>
+            </tr>
+
+            <tr>
+                <td>2020</td>
+                <td>3</td>
+                <td><a href="javascript:void(0);" onclick="deleteTr(this);">删除</a></td>
+            </tr>
+
+            <tr>
+                <td>2021</td>
+                <td>5</td>
+                <td><a href="javascript:void(0);" onclick="deleteTr(this);">删除</a></td>
+            </tr>
+
+            <tr>
+                <td>2022</td>
+                <td>4</td>
+                <td><a href="javascript:void(0);" onclick="deleteTr(this);">删除</a></td>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+
+    <script>
+        var data_count = 3;
+        var datas = [
+            {
+                year: 2019,
+                value: 2,
+            },
+            {
+                year: 2020,
+                value: 3,
+            },
+            {
+                year: 2021,
+                value: 5,
+            },
+            {
+                year: 2022,
+                value: 4,
+            },
+
+        ]
+
+        var tbody = document.querySelector('tbody');
+        /* for (var i = 0; i < data_count; i++) {
+            var tr = document.createElement('tr');
+            tbody.appendChild(tr);
+
+            for (var k in datas[i]) {
+                var td = document.createElement('td');
+                td.innerHTML = datas[i][k];
+                tr.appendChild(td);
+            }
+            var td = document.createElement('td');
+            td.innerHTML = '<a href = "javascript:;"  onclick="deleteTr(this);"> 删除</a>';
+            tr.appendChild(td);
+        }*/
+
+
+        var insert = document.getElementById("insert");
+        insert.onclick = function () {
+            var new_year = document.getElementById("input_year").value;
+            var new_value = document.getElementById("input_value").value;
+
+            //console.log(new_year, new_value);
+            if (new_year.length == 0 || new_value == "") {
+                alert("年份或产量不能为空！");
+                return;
+            }
+
+            var tr = document.createElement('tr');
+            tbody.appendChild(tr);
+
+            var td = document.createElement('td');
+            td.innerHTML = new_year;
+            tr.appendChild(td);
+
+            var td = document.createElement('td');
+            td.innerHTML = new_value;
+            tr.appendChild(td);
+
+            var td = document.createElement('td');
+            td.innerHTML = '<a href="javascript:void(0);" onclick="deleteTr(this);">删除</a>';
+            tr.appendChild(td);
+
+            data_count += 1;
+            //console.log(data_count);
+
+        }
+
+        /* var del = document.querySelectorAll('a');
+        console.log(del);
+        for (var i = 0; i < data_count; i++) {
+            del[i].onclick = function () {
+                console.log(i);
+                tbody.removeChild(this.parentNode.parentNode);
+            }
+        } */
+
+        function deleteTr(obj) {
+            //tbody.removeChild(obj.parentNode.parentNode);
+            var table = obj.parentNode.parentNode.parentNode;
+            // 获取te节点
+            var tr = obj.parentNode.parentNode;
+            // 删除（并返回）当前节点的指定子节点。
+            table.removeChild(tr);
+        }
+
+        /* 生成图表按钮与接口 */
+        var get_chart = document.getElementById('get_chart');
+        get_chart.onclick = function () {
+            var all_data = document.querySelectorAll('tr');
+
+            //只有标题，没有元素
+            if (all_data.length <= 1) {
+                alert("数据为空，无法生成图表，请添加数据！");
+                return;
+            }
+
+            var year = new Array();
+            var value = new Array();
+
+            for (var i = 1; i < all_data.length; i++) {
+
+                var chart_data = all_data[i].querySelectorAll('td');
+                year.push(chart_data[0].innerText);
+                value.push(chart_data[1].innerText);
+            }
+
+            console.log(year);
+            console.log(value);
+
+            localStorage.clear();
+            localStorage.setItem('year', JSON.stringify(year));
+            localStorage.setItem('value', JSON.stringify(value));
+            window.location.href = "./index.html";
+        }
+
+        //清空表单数据
+        var clearData = document.getElementById('clear_data');
+        clearData.onclick = function () { clearTable(); }
+
+        function clearTable() {
+            var all_data = document.querySelectorAll('tr');
+
+            //只有标题，没有元素，无法清除，页面不变
+            if (all_data.length <= 1) {
+                return;
+            }
+
+            for (var i = 1; i < all_data.length; i++) {
+                var tbody = all_data[i].parentNode;
+                tbody.removeChild(all_data[i]);
+
+            }
+        }
+
+        //恢复之前的数据
+        function restoreData() {
+
+            clearTable();
+            var value = JSON.parse(localStorage.getItem('value'));
+            var year = JSON.parse(localStorage.getItem('year'));
+
+            console.log(year);
+            console.log(value);
+
+
+            for (var i = 0; i < year.length; i++) {
+                var tr = document.createElement('tr');
+                tbody.appendChild(tr);
+
+                var td = document.createElement('td');
+                td.innerHTML = year[i];
+                tr.appendChild(td);
+
+                var td = document.createElement('td');
+                td.innerHTML = value[i];
+                tr.appendChild(td);
+
+                var td = document.createElement('td');
+                td.innerHTML = '<a href="javascript:void(0);" onclick="deleteTr(this);">删除</a>';
+                tr.appendChild(td);
+            }
+        }
+
+        restoreData();
+
+    </script>
+</body>
+
+</html>
