@@ -572,8 +572,6 @@ function histogram_style(_hide, solid, gradient, pattern, before) {
     //隐藏柱状图
     if (_hide == true) {
 
-        //show.histogram = false;
-
         //重绘背景
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "#e5f7ff"; // 设置Canvas背景颜色为白色
@@ -590,8 +588,6 @@ function histogram_style(_hide, solid, gradient, pattern, before) {
     }
 
     else {
-        //if (!show.histogram) {
-        //show.histogram = true;
 
         //单色
         if (solid != null) {
@@ -651,15 +647,6 @@ function histogram_style(_hide, solid, gradient, pattern, before) {
     }
 }
 
-function resize() {
-    //var test = document.querySelectorAll('canvas');
-    var test = document.getElementById("myCanvas");
-    var new_width = 950;
-    var new_height = 600;
-    canvas.width = new_width;
-    canvas.height = new_height;
-}
-
 
 //隐藏柱状图
 var hide_histogram = document.getElementById("hide_histogram");
@@ -697,12 +684,6 @@ submit_histogram_style.onclick = function () {
     var gradient = document.getElementById("gradient").checked;
     var pattern = document.getElementById("pattern").checked;
     var _default = document.getElementById("default").checked;
-
-    /* //隐藏
-    if (hide) {
-        histogram_style(true, null, null, null, null);
-        return;
-    } */
 
     //solid单色
     if (solid) {
@@ -762,7 +743,6 @@ function count_proportion() {
         prop.push((sum / parseFloat(value[i])).toFixed(2));
     }
 
-    //console.log(prop);
     return prop;
 }
 
