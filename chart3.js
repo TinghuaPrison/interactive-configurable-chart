@@ -670,6 +670,7 @@ function count_proportion() {
     return prop;
 }
 
+//绘制折线图
 function paint_line_chart() {
     var margin_left = 20;
     var margin_right = 20;
@@ -679,7 +680,16 @@ function paint_line_chart() {
 
     var coor = [];
 
-    //先绘制圆圈
+    //绘制折线
+    ctx.fillStyle = "black";
+    for (var i = 0; i < coor.length - 1; i++) {
+        ctx.beginPath();
+        ctx.moveTo(coor[i].x, coor[i].y);
+        ctx.lineTo(coor[i + 1].x, coor[i + 1].y);
+        ctx.stroke();
+    }
+
+    //绘制圆圈
     for (var i = 0; i < n; i++) {
 
         //计算矩形高度
@@ -696,17 +706,6 @@ function paint_line_chart() {
 
         //递增
         coor_x += (data_width + margin_right);
-    }
-
-    //console.log(coor);
-
-    //绘制折线
-    ctx.fillStyle = 'black';
-    for (var i = 0; i < coor.length - 1; i++) {
-        ctx.beginPath();
-        ctx.moveTo(coor[i].x, coor[i].y);
-        ctx.lineTo(coor[i + 1].x, coor[i + 1].y);
-        ctx.stroke();
     }
 
     //绘制占比
