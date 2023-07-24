@@ -616,8 +616,6 @@ function histogram_style(_hide, solid, gradient, pattern, before) {
 
             //加载好了才绘柱状图
             img.onload = function () {
-                //if (hide.histogram == false)
-
                 paint_histogram(null, null, pattern, null, false, false);
             };
 
@@ -705,6 +703,7 @@ submit_histogram_style.onclick = function () {
         var pattern_img = document.getElementById('pattern_img');
         var selectedPatternImg = pattern_img.files;
         if (selectedPatternImg.length == 1) {
+            //console.log(selectedPatternImg[0]);
             var patternStyle = {
                 img: window.URL.createObjectURL(selectedPatternImg[0]),
                 repetition: "repeat"
@@ -793,15 +792,13 @@ function paint_line_chart() {
     }
 }
 
-
-
 function setBackground() {
+    //保证先等图片加载完毕，绘制背景后，再绘制其他的内容
+    return new Promise(function (resolve, reject) {
+        clearBoard();
+        const backgroundImg = new Image();
+        backgroundImg.src = './images/background/bg2.jpg';
 
-    clearBoard();
-    const backgroundImg = new Image();
-    backgroundImg.src = './images/background/bg2.jpg';
-
-    if (first) {
         backgroundImg.onload = function () {
 
             //https://www.runoob.com/jsref/prop-canvas-globalalpha.html
@@ -810,29 +807,19 @@ function setBackground() {
             ctx.globalAlpha = 0.5;
             ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
             ctx.globalAlpha = 1;
-
-            paint_y_axis();
-            paint_x_axis();
-
-            histogram_style(false, null, null, null, true);
-            paint_line_chart();
+            resolve();
         };
-
-        first = false;
-    }
-
-    else {
-        ctx.globalAlpha = 0.5;
-        ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
-        ctx.globalAlpha = 1;
-    }
-
+    });
 }
 
-//主程序，打开网页时运行
-function main() {
 
-    setBackground();
+//主程序，打开网页时运行
+//https://cloud.tencent.com/developer/article/1665737
+async function main() {
+
+    await setBackground();
+
+    console.log("otherpaint");
     paint_y_axis();
     paint_x_axis();
 
