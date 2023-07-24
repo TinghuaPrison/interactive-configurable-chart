@@ -6,8 +6,6 @@ var max;    //数据中的最小值
 var n; //数据个数
 var N_tick = 5;//间隔个数
 
-
-
 var result; //计算后结果
 var value = [1223, 122, 893, 346, 457, 738, 324];//产量
 var year = [2013, 2014, 2015, 2016, 2017, 2018, 2019];//年份
@@ -254,7 +252,11 @@ var dataMarginRight = 20;
 var dataWidth = 50;
 
 //关于柱状图
-var maxDataHeight;
+var maxDataHeight; //原点至y轴最大刻度的距离
+
+//关于全局
+var first = true; //设置背景图片使用
+var defaultFontStyle = "20px serif";
 
 //排序方式：0默认，1升序，2降序
 var order = {
@@ -358,7 +360,7 @@ function paint_y_axis() {
     ctx.stroke();
 
     //y轴标签
-    ctx.font = "16px serif";
+    ctx.font = defaultFontStyle;
     ctx.fillText("产量（万吨）", originPoint.x + 50, yAxisEndPoint.y - 25);
 
     //y轴刻度值与刻度坐标
@@ -378,7 +380,7 @@ function paint_y_axis() {
         ctx.stroke();
 
         // 绘制刻度值
-        ctx.font = "15px serif";
+        ctx.font = defaultFontStyle;
         ctx.fillText(y.toString(), yMarginLeft - 10, yPos);
 
         yVal = parseFloat(y) + parseFloat(tickRange);
@@ -409,7 +411,7 @@ function paint_x_axis() {
     ctx.stroke();
 
     //x轴标签
-    ctx.font = "16px serif";
+    ctx.font = defaultFontStyle;
     ctx.fillText("年份", xAxisEndPoint.x + 50, originPoint.y);
 
     var coor_x = originPoint.x;
@@ -423,7 +425,7 @@ function paint_x_axis() {
         //绘制年份
         ctx.textAlign = "center";
         ctx.fillStyle = "black"
-        ctx.font = "16px serif";
+        ctx.font = defaultFontStyle;
         ctx.fillText(year[i].toString(), coor_x + dataWidth / 2, originPoint.y + 20);
 
         //右边距
@@ -555,7 +557,7 @@ function paint_histogram(solid, gradient, pattern, before, shadow, show_num_labe
         if (show_num_label) {
             ctx.textAlign = "center";
             ctx.fillStyle = "black"
-            ctx.font = "16px serif";
+            ctx.font = defaultFontStyle;
             ctx.fillText(value[i].toString(), coor_x + dataWidth / 2, coor_y - dataHeight - 15);
         }
 
@@ -786,16 +788,51 @@ function paint_line_chart() {
     //绘制占比
     var proportion = count_proportion();
     for (var i = 0; i < value.length; i++) {
-        ctx.font = "16px serif";
+        ctx.font = defaultFontStyle;
         ctx.fillText(proportion[i].toString() + '%', coor[i].x, coor[i].y - 20);
     }
 }
 
 
+
+function setBackground() {
+
+    clearBoard();
+    const backgroundImg = new Image();
+    backgroundImg.src = './images/background/bg2.jpg';
+
+    if (first) {
+        backgroundImg.onload = function () {
+
+            //https://www.runoob.com/jsref/prop-canvas-globalalpha.html
+
+            //透明度
+            ctx.globalAlpha = 0.5;
+            ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
+            ctx.globalAlpha = 1;
+
+            paint_y_axis();
+            paint_x_axis();
+
+            histogram_style(false, null, null, null, true);
+            paint_line_chart();
+        };
+
+        first = false;
+    }
+
+    else {
+        ctx.globalAlpha = 0.5;
+        ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
+        ctx.globalAlpha = 1;
+    }
+
+}
+
 //主程序，打开网页时运行
 function main() {
 
-    clearBoard();
+    setBackground();
     paint_y_axis();
     paint_x_axis();
 
@@ -806,6 +843,7 @@ function main() {
 
 initial();
 main();
+
 
 
 //柱状图产量的排序
