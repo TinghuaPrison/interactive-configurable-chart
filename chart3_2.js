@@ -279,6 +279,19 @@ var style_before = {
     pattern: null,
 };
 
+var line_chart_style = {
+    hide: false,
+    lineColor: "black",
+    lineShape: "solid",
+    lineWidth: 2,
+    dotColor: "black",
+    dotShape: "arc",
+    dotSize: 5,
+    fontFamily: "宋体",
+    fontColor: "black",
+    fontSize: "18px",
+}
+
 //初始化
 function initial() {
 
@@ -392,6 +405,8 @@ function paint_y_axis() {
 
 //绘制x轴
 function paint_x_axis() {
+
+    ctx.fillStyle = 'black';
 
     //x轴线
     ctx.beginPath();
@@ -568,16 +583,14 @@ function paint_histogram(solid, gradient, pattern, before, shadow, show_num_labe
 }
 
 //先选择样式再绘画的接口
-function histogram_style(_hide, solid, gradient, pattern, before) {
+async function histogram_style(_hide, solid, gradient, pattern, before) {
 
 
     //隐藏柱状图
     if (_hide == true) {
 
         //重绘背景
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#e5f7ff"; // 设置Canvas背景颜色为白色
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        await setBackground();
 
         //重绘坐标轴
         paint_y_axis();
@@ -655,6 +668,8 @@ hide_histogram.onclick = function () {
     //if (!show.histogram)
     hide.histogram = hide_histogram.checked;
     histogram_style(hide_histogram.checked, null, null, null, style_before);
+
+
 }
 
 
@@ -747,14 +762,97 @@ function count_proportion() {
     return prop;
 }
 
+// 隐藏折线图
+document.getElementById("hide_line_chart").addEventListener("input", function () {
+    line_chart_style.hide = document.getElementById("hide_line_chart").checked;
+    main();
+})
+
+document.getElementById("line_color").addEventListener("input", function () {
+    line_chart_style.lineColor = document.getElementById("line_color").value;
+    main();
+})
+
+document.getElementById("line_shape").addEventListener("change", function () {
+    line_chart_style.lineShape = document.getElementById("line_shape").value;
+    main();
+});
+
+document.getElementById("line_width").addEventListener("input", function () {
+    line_chart_style.lineWidth = document.getElementById("line_width").value;
+    main();
+})
+
+document.getElementById("dot_color").addEventListener("input", function () {
+    line_chart_style.dotColor = document.getElementById("dot_color").value;
+    main();
+})
+
+document.getElementById("dot_shape").addEventListener("change", function () {
+    line_chart_style.dotShape = document.getElementById("dot_shape").value;
+    main();
+});
+
+document.getElementById("dot_size").addEventListener("input", function () {
+    line_chart_style.dotSize = document.getElementById("dot_size").value;
+    main();
+});
+
+document.getElementById("font_family").addEventListener("change", function () {
+    line_chart_style.fontFamily = document.getElementById("font_family").value;
+    main();
+});
+
+document.getElementById("font_color").addEventListener("input", function () {
+    line_chart_style.fontColor = document.getElementById("font_color").value;
+    main();
+});
+
+document.getElementById("font_size").addEventListener("input", function () {
+    line_chart_style.fontSize = document.getElementById("font_size").value + "px";
+    main();
+});
 
 //绘制折线图
 function paint_line_chart() {
 
+    if (line_chart_style.hide == true) {
+        return;
+    }
+
     var coor_x = originPoint.x;
     var coor = [];
 
-    //先绘制圆圈
+    //先计算圆圈的坐标
+    ctx.fillStyle = line_chart_style.dotColor;
+    for (var i = 0; i < n; i++) {
+
+        //计算矩形高度
+        var dataHeight = (value[i] - result[0]) * (maxDataHeight / (result[1] - result[0]));
+        coor_x += dataMarginLeft;
+
+        coor.push({ x: coor_x + dataWidth / 2, y: originPoint.y - dataHeight - 40 });
+
+        //递增
+        coor_x += (dataWidth + dataMarginRight);
+    }
+
+    // 绘制直线
+    ctx.strokeStyle = line_chart_style.lineColor;
+    if (line_chart_style.lineShape == "dashed") {
+        ctx.setLineDash([4, 4]);
+    }
+    ctx.lineWidth = line_chart_style.lineWidth;
+    for (var i = 0; i < coor.length - 1; i++) {
+        ctx.beginPath();
+        ctx.moveTo(coor[i].x, coor[i].y);
+        ctx.lineTo(coor[i + 1].x, coor[i + 1].y);
+        ctx.stroke();
+    }
+
+    coor_x = originPoint.x;
+
+    //绘制圆圈
     for (var i = 0; i < n; i++) {
 
         //计算矩形高度
@@ -764,30 +862,25 @@ function paint_line_chart() {
         ctx.beginPath();
         //http://caibaojian.com/html5-canvas-arc.html
         //https://blog.csdn.net/Jacgu/article/details/106378627
-        ctx.arc(coor_x + dataWidth / 2, originPoint.y - dataHeight - 40, 5, 0, 2 * Math.PI);
-        ctx.fillStyle = "blue";
+        if (line_chart_style.dotShape == "arc") {
+            ctx.arc(coor_x + dataWidth / 2, originPoint.y - dataHeight - 40, line_chart_style.dotSize, 0, 2 * Math.PI);
+        } else {
+            ctx.rect(coor_x + dataWidth / 2 - line_chart_style.dotSize / 2 * Math.sqrt(2),
+                originPoint.y - dataHeight - 40 - line_chart_style.dotSize / 2 * Math.sqrt(2),
+                line_chart_style.dotSize * Math.sqrt(2),
+                line_chart_style.dotSize * Math.sqrt(2));
+        }
         ctx.fill();
-        coor.push({ x: coor_x + dataWidth / 2, y: originPoint.y - dataHeight - 40 });
 
         //递增
         coor_x += (dataWidth + dataMarginRight);
     }
 
-    //console.log(coor);
-
-    //绘制折线
-    ctx.fillStyle = 'black';
-    for (var i = 0; i < coor.length - 1; i++) {
-        ctx.beginPath();
-        ctx.moveTo(coor[i].x, coor[i].y);
-        ctx.lineTo(coor[i + 1].x, coor[i + 1].y);
-        ctx.stroke();
-    }
-
     //绘制占比
+    ctx.fillStyle = line_chart_style.fontColor;
     var proportion = count_proportion();
     for (var i = 0; i < value.length; i++) {
-        ctx.font = defaultFontStyle;
+        ctx.font = line_chart_style.fontSize + ' ' + line_chart_style.fontFamily;
         ctx.fillText(proportion[i].toString() + '%', coor[i].x, coor[i].y - 20);
     }
 }
@@ -824,7 +917,8 @@ async function main() {
     paint_x_axis();
 
 
-    histogram_style(false, null, null, null, true);
+    if (hide.histogram == false)
+        histogram_style(false, null, null, null, true);
     paint_line_chart();
 }
 

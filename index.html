@@ -48,6 +48,60 @@
 
     </div>
 
+    <div class="line_chart_style">
+        <div class="title">折线图样式设置</div>
+        <div class="checkbox_style">
+            <input type="checkbox" name="hide_line_chart" id="hide_line_chart">
+            <label for="hide_line_chart">隐藏折线图</label>
+        </div>
+        <div class="checkbox_style">
+            <label for="line_color">字体颜色：</label>
+            <input type="color" name="line_color" id="line_color">
+        </div>
+        <div class="checkbox_style">
+            <label for="line_shape">线条形状：</label>
+            <select name="line_shape" id="line_shape">
+                <option value="solid" selected>实线</option>
+                <option value="dashed">虚线</option>
+            </select>
+        </div>
+        <div class="checkbox_style">
+            <label for="line_width">线条宽度：</label>
+            <input type="range" name="line_width" id="line_width" min="1" max="5" value="2">
+        </div>
+        <div class="checkbox_style">
+            <label for="dot_color">点的颜色：</label>
+            <input type="color" name="dot_color" id="dot_color">
+        </div>
+        <div class="checkbox_style">
+            <label for="dot_shape">点的形状：</label>
+            <select name="dot_shape" id="dot_shape">
+                <option value="arc" selected>圆形</option>
+                <option value="rect">矩形</option>
+            </select>
+        </div>
+        <div class="checkbox_style">
+            <label for="dot_size">点的大小：</label>
+            <input type="range" name="dot_size" id="dot_size" min="2" max="10" value="5">
+        </div>
+        <div class="checkbox_style">
+            <label for="font_family">字体：</label>
+            <select name="font_family" id="font_family">
+                <option value="宋体" selected>宋体</option>
+                <option value="Arial">Arial</option>
+                <option value="Helvetica">Helvetica</option>
+            </select>
+        </div>
+        <div class="checkbox_style">
+            <label for="font_color">字体颜色：</label>
+            <input type="color" name="font_color" id="font_color">
+        </div>
+        <div class="checkbox_style">
+            <label for="font_size">字体大小：</label>
+            <input type="range" name="font_size" id="font_size" min="10" max="20" value="12">
+        </div>
+    </div>
+
     <div class="value_order">
         <div class="title">按产量排序</div>
         <input type="checkbox" name="value_original" id="value_original">
