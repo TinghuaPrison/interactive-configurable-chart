@@ -810,7 +810,8 @@ function count_proportion() {
         sum += parseFloat(value[i]);
 
     for (var i = 0; i < value.length; i++) {
-        prop.push((sum / parseFloat(value[i])).toFixed(2));
+        console.log(sum / value[i]);
+        prop.push(((parseFloat(value[i]) / sum) * 100).toFixed(2));
     }
 
     return prop;
