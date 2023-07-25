@@ -375,6 +375,10 @@ function resize() {
 
     else {
         canvas.width = defaultCanvasWidth;
+        var canvasContainer = document.getElementById('canvasContainer');
+        var canvasContainerStyle = canvasContainer.getAttribute("style");
+        var newCanvasContainerStyle = "width: 1000px; height: 550px;";
+        canvasContainer.setAttribute("style", newCanvasContainerStyle);
     }
 }
 
