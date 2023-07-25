@@ -1216,6 +1216,11 @@ document.getElementById("data_filtering").addEventListener("click", function () 
 
         //响应操作间下方
     }
+
+    else if (type == "percentage") {
+        document.getElementById("percentage_options").style.display = "block";
+        return;
+    }
     main();
 });
 
@@ -1262,4 +1267,29 @@ rangeOptionsInputs[2].addEventListener("click", function () {
 
         main();
     }
+});
+
+document.getElementById("select_percentage").addEventListener("input", function () {
+    document.getElementById("percentage_options").style.display = "none";
+    var percentage = document.getElementById("select_percentage").value;
+    var newYear = [];
+    var newValue = [];
+    var selectedMark = [];
+    var orderedValue = [...value];
+    orderedValue.sort(function (a, b) {return b - a});
+    for (var i = 0; i < n; i++) {
+        if (parseInt(value[i]) >= parseInt(orderedValue[Math.floor(n * percentage / 100 - 1)])) {
+            newYear.push(year[i]);
+            newValue.push(value[i]);
+            selectedMark.push(true);
+        } else {
+            selectedMark.push(false);
+        }
+    }
+    year = newYear;
+    value = newValue;
+    filterMark = selectedMark;
+    n = year.length;
+
+    main();
 });

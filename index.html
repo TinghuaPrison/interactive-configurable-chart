@@ -132,12 +132,21 @@
                 <option value="above_avg">均值之上</option>
                 <option value="below_avg">均值之下</option>
                 <option value="range" id="range">范围</option>
+                <option value="percentage" id="percentage">百分比</option>
             </select>
             <div id="range_options" style="display: none;">
                 最小值: <input type="number" name="min_value" id="min_range_value">
                 最大值: <input type="number" name="max_value" id="max_range_value">
                 <input type="button" value="OK" id="set_range">
-
+            </div>
+            <div id="percentage_options" style="display: none;">
+                <select name="select_percentage" id="select_percentage">
+                    <option value="100" selected>前100%</option>
+                    <option value="80" >前80%</option>
+                    <option value="60" >前60%</option>
+                    <option value="40">前40%</option>
+                    <option value="20">前20%</option>
+                </select>
             </div>
         </div>
 

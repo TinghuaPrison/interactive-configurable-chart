@@ -245,6 +245,14 @@ canvas {
     border: 1px solid black;
 }
 
+.data_selecting #percentage_options {
+    position: absolute;
+    top: 80px;
+    left: 170px;
+    width: 180px;
+    height: 100px;
+}
+
 /* 
 .data_selecting #range:hover {
     display: block;
