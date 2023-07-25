@@ -7,12 +7,20 @@ body {
     position: relative;
 }
 
+#canvasContainer {
+    position: absolute;
+    /*  top: 50px; */
+    top: 50px;
+    left: 300px;
+    border: 1px solid black;
+}
+
 canvas {
     position: absolute;
     width: 1000;
     height: 1300;
-    left: 300px;
-    margin-top: 50px;
+    left: 0px;
+    margin-top: 0px;
     border: 1px solid black;
     /* background-color: #e5f7ff; */
     /* background-color: violet; */
@@ -78,7 +86,7 @@ canvas {
 .value_order {
     position: absolute;
     top: 50px;
-    left: 560px;
+    left: 450px;
     width: 230px;
     /* height: 50px; */
     height: 100px;
@@ -103,7 +111,7 @@ canvas {
 .year_order {
     position: absolute;
     top: 50px;
-    left: 860px;
+    left: 700px;
     width: 230px;
     /* height: 50px; */
     height: 100px;
@@ -128,13 +136,14 @@ canvas {
 #quit {
     position: absolute;
     top: 50px;
-    left: 1200px;
+    left: 300px;
     width: 100px;
     height: 30px;
     background-color: bisque;
     font-size: 20px;
     font-weight: 700;
     text-align: center;
+    border: 1px solid black;
 }
 
 .line_chart_style {
@@ -193,3 +202,50 @@ canvas {
     width: 100px;
     height: 30px;
 }
+
+.data_selecting {
+
+    position: absolute;
+    top: 50px;
+    left: 950px;
+    width: 200px;
+    height: 100px;
+    background-color: bisque;
+}
+
+.data_selecting .title {
+    padding: 5px 0px 5px 0px;
+    background-color: rgb(172, 160, 146);
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.data_selecting label {
+    position: absolute;
+    margin-top: 15px;
+    margin-left: 40px;
+    text-align: center;
+}
+
+.data_selecting #data_filtering {
+    position: absolute;
+    margin-top: 15px;
+    margin-left: 90px;
+    text-align: center;
+}
+
+.data_selecting #range_options {
+    position: absolute;
+    top: 80px;
+    left: 170px;
+    width: 180px;
+    height: 100px;
+    background-color: bisque;
+    border: 1px solid black;
+}
+
+/* 
+.data_selecting #range:hover {
+    display: block;
+} */

@@ -1,31 +1,53 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<div style="border:1px solid #ccc">
-    <canvas id="canvas-1" width="520" height="300">
-    </canvas>
-</div>
+<html>
 
-<script>
-    var c = document.getElementById("canvas-1");
-    var ctx = c.getContext("2d");
+<head>
 
-    ctx.globalAlpha = 0.5;
+</head>
 
-    var img = new Image();
-    img.src = './images/background/bg1.jpg';
-    img.onload = function () {
-        draw(this);
-    };
+<body>
 
-    function draw(img) {
-        ctx.drawImage(img, 10, 10, img.width, img.height);
-        ctx.fillStyle = "green"
-        ctx.fillRect(50, 50, 200, 100);
-        ctx.fillStyle = "#ffffff"
-        ctx.fillRect(0, 0, c.width, c.height);
-        ctx.drawImage(img, 10 + 200, 10 + 200, img.width, img.height);
-        ctx.fillStyle = "green"
-        ctx.fillRect(50 + 100, 50 + 100, 200, 100);
-    }
+    <div id="canvasContainer" style="width: 400px; height: 600px; overflow: scroll;">
+        <canvas id="myCanvas" width="500" height="600"></canvas>
+    </div>
 
-</script>
+    <script>
+        // 获取画布和容器元素的引用
+        const canvas = document.getElementById("myCanvas");
+        const container = document.getElementById("canvasContainer");
+
+        // 定义画布偏移量
+        let offsetX = 0;
+        let offsetY = 0;
+
+        function drawSquare(x, y, size) {
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // 清除画布
+
+            // 绘制正方形
+            ctx.beginPath();
+            ctx.rect(x - offsetX, y - offsetY, size, size);
+            ctx.fillStyle = "red";
+            ctx.fill();
+            ctx.closePath();
+        }
+
+
+        container.addEventListener("scroll", function () {
+            offsetX = container.scrollLeft;
+            offsetY = container.scrollTop;
+            /* offsetX = 1200;
+            offsetY = 600; */
+            //console.log(offsetX, offsetY);
+            //drawSquare(1000, 500, 50); // 重新绘制正方形
+
+        });
+
+        drawSquare(1000, 500, 100);
+
+
+    </script>
+</body>
+
+</html>

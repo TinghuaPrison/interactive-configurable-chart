@@ -7,8 +7,9 @@
 </head>
 
 <body>
-    <canvas id="myCanvas" width="1000" height="1300"></canvas>
-
+    <div id="canvasContainer" style="width: 1000px; height: 600px;">
+        <canvas id="myCanvas" width="1000" height="1300"></canvas>
+    </div>
     <div class="data">
 
     </div>
@@ -55,7 +56,7 @@
             <label for="hide_line_chart">隐藏折线图</label>
         </div>
         <div class="checkbox_style">
-            <label for="line_color">字体颜色：</label>
+            <label for="line_color">线条颜色：</label>
             <input type="color" name="line_color" id="line_color">
         </div>
         <div class="checkbox_style">
@@ -98,7 +99,7 @@
         </div>
         <div class="checkbox_style">
             <label for="font_size">字体大小：</label>
-            <input type="range" name="font_size" id="font_size" min="10" max="20" value="12">
+            <input type="range" name="font_size" id="font_size" min="10" max="25" value="18">
         </div>
     </div>
 
@@ -121,6 +122,27 @@
         <input type="checkbox" name="year_descending" id="year_descending">
         <label for="year_descending">降序</label>
     </div>
+
+    <div class="data_selecting">
+        <div class="title">数据筛选与过滤</div>
+        <div class="checkbox_style">
+            <label for="data_filtering">方式：</label>
+            <select name="data_filtering" id="data_filtering">
+                <option value="none" selected>无</option>
+                <option value="above_avg">均值之上</option>
+                <option value="below_avg">均值之下</option>
+                <option value="range" id="range">范围</option>
+            </select>
+            <div id="range_options" style="display: none;">
+                最小值: <input type="number" name="min_value" id="min_range_value">
+                最大值: <input type="number" name="max_value" id="max_range_value">
+                <input type="button" value="OK" id="set_range">
+
+            </div>
+        </div>
+
+    </div>
+
 
     <div id="quit">
         退出

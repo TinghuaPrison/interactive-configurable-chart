@@ -11,6 +11,8 @@ var value = [1223, 122, 893, 346, 457, 738, 324];//产量
 var year = [2013, 2014, 2015, 2016, 2017, 2018, 2019];//年份
 var originDataValue = []; //原始数据
 var originDataYear = []; //原始数据
+var filterMark = null;
+var valueSum = 0;
 
 
 //https://juejin.cn/post/7033761580214911007
@@ -182,10 +184,10 @@ function count2() {
 
     // 若达到触发条件，动态改变原点值
     if (0 < diffPercentage && diffPercentage <= 0.6) {
-        var x = (0.6 * minProduction - 1) / 0.6;
+        var x = (0.6 * minValue - 1) / 0.6;
         var newOriginValue = Math.floor(x);
         originProduct = newOriginValue;
-        transformedMaxValue = maxValue - newOriginNumber;
+        transformedMaxValue = maxValue - newOriginValue;
     }
 
     // 否则，原点值默认为0
@@ -255,8 +257,10 @@ var dataWidth = 50;
 var maxDataHeight; //原点至y轴最大刻度的距离
 
 //关于全局
-var first = true; //设置背景图片使用
 var defaultFontStyle = "20px serif";
+var first = true;
+var defaultCanvasWidth = 1000;
+var defaultCanvasHeight = 1300;
 
 //排序方式：0默认，1升序，2降序
 var order = {
@@ -274,11 +278,12 @@ var hide = {
 //保存柱状图之前的样式
 var style_before = {
     solid: null,
-    color1: "rgb(18, 179, 138)",
-    color2: "rgb(217, 236, 232)",
+    color1: "rgb(77, 163, 255)",
+    color2: "rgb(250, 184, 255)",
     pattern: null,
 };
 
+//折线图样式
 var line_chart_style = {
     hide: false,
     lineColor: "black",
@@ -292,19 +297,34 @@ var line_chart_style = {
     fontSize: "18px",
 }
 
+//数据筛选与过滤
+var dataFilterType = {
+    default: true,
+    aboveAverage: false,
+    belowAverage: false,
+}
+
+
 //初始化
 function initial() {
 
-    originDataValue = JSON.parse(localStorage.getItem('value'));
-    originDataYear = JSON.parse(localStorage.getItem('year'));
+    if (first) {
+        originDataValue = JSON.parse(localStorage.getItem('value'));
+        originDataYear = JSON.parse(localStorage.getItem('year'));
 
-    value = originDataValue;
-    year = originDataYear;
+        value = originDataValue;
+        year = originDataYear;
 
-    n = value.length;
+        n = value.length;
 
-    //先计算
-    count2();
+        for (var i = 0; i < value.length; i++)
+            valueSum += parseFloat(value[i]);
+
+        //先计算
+        count2();
+
+        first = false;
+    }
 
     var originValue = result[0];
     var tickRange = result[2]; // 刻度线的高度
@@ -322,7 +342,11 @@ function initial() {
 
     //x轴
     var xAxisStart = originPoint.x; // y轴起点的y坐标
-    var xAxisEnd = originPoint.x + (dataWidth * n) + (dataMarginLeft * n) + (dataMarginRight * n);// y轴终点的y坐标
+    var xAxisEnd = originPoint.x + (dataWidth * value.length) + (dataMarginLeft * value.length) + (dataMarginRight * value.length);// y轴终点的y坐标
+
+    //如果被筛选后没有可显示的数据，也要保证x轴有一定长度
+    if (xAxisEnd == originPoint.x || xAxisEnd < 500)
+        xAxisEnd = 500;
 
     xAxisEndPoint.x = xAxisEnd;
     xAxisEndPoint.y = originPoint.y;
@@ -334,8 +358,25 @@ function initial() {
     canvas.height = originPoint.y + 100;
     canvas.width = xAxisEndPoint.x + 100;
 
+    //可能需要添加滑动跳
+    resize();
 }
 
+
+function resize() {
+
+    //超出了默认宽度，添加滑动条
+    if (canvas.width > defaultCanvasWidth) {
+        var canvasContainer = document.getElementById('canvasContainer');
+        var canvasContainerStyle = canvasContainer.getAttribute("style");
+        var newCanvasContainerStyle = "width: 1000px; height: 568px; overflow-x: scroll;";
+        canvasContainer.setAttribute("style", newCanvasContainerStyle);
+    }
+
+    else {
+        canvas.width = defaultCanvasWidth;
+    }
+}
 
 //清空画布
 function clearBoard() {
@@ -384,7 +425,6 @@ function paint_y_axis() {
     for (var i = 0; i <= numIntervals + 1; i++) {
 
         var y = (parseFloat(yVal)).toFixed(2);
-        //console.log(y, y_pos + yMarginTop);
 
         // 绘制刻度线
         ctx.beginPath();
@@ -432,7 +472,7 @@ function paint_x_axis() {
     var coor_x = originPoint.x;
 
     //绘制x轴刻度（年份）
-    for (var i = 0; i < n; i++) {
+    for (var i = 0; i < value.length; i++) {
 
         //左边距
         coor_x += dataMarginLeft;
@@ -455,10 +495,9 @@ function paint_histogram(solid, gradient, pattern, before, shadow, show_num_labe
     var coor_x = originPoint.x;
     var coor_y = originPoint.y;
 
-    for (var i = 0; i < n; i++) {
+    for (var i = 0; i < value.length; i++) {
 
         //计算矩形高度
-
         var dataHeight = (parseFloat(value[i]) - result[0]) * (maxDataHeight / (result[1] - result[0]));
         coor_x += dataMarginLeft;
 
@@ -496,6 +535,7 @@ function paint_histogram(solid, gradient, pattern, before, shadow, show_num_labe
 
             style_before.pattern = pattern;
             style_before.solid = style_before.color1 = style_before.color2 = null;
+
         }
 
         //恢复之前的样式
@@ -525,13 +565,13 @@ function paint_histogram(solid, gradient, pattern, before, shadow, show_num_labe
         //默认
         else {
             var grd = ctx.createLinearGradient(coor_x + dataWidth / 2, coor_y, coor_x + dataWidth / 2, coor_y - dataHeight);
-            grd.addColorStop(0, "rgb(18, 179, 138)");
-            grd.addColorStop(1, "rgb(217, 236, 232)");
+            grd.addColorStop(0, "rgb(77, 163, 255)");
+            grd.addColorStop(1, "rgb(250, 184, 255)");
             ctx.fillStyle = grd;
 
             style_before.solid = null;
-            style_before.color1 = "rgb(18, 179, 138)";
-            style_before.color2 = "rgb(217, 236, 232)";
+            style_before.color1 = "rgb(77, 163, 255)";
+            style_before.color2 = "rgb(250, 184, 255)";
         }
 
         //绘制矩形
@@ -626,10 +666,10 @@ async function histogram_style(_hide, solid, gradient, pattern, before) {
             var img = new Image();
             img.src = pattern.img;
 
-
             //加载好了才绘柱状图
             img.onload = function () {
-                paint_histogram(null, null, pattern, null, false, false);
+                if (hide.histogram == false)
+                    paint_histogram(null, null, pattern, null, false, false);
             };
 
         }
@@ -693,7 +733,7 @@ for (var i = 1; i < checkbox_style.length; i++) {
 var submit_histogram_style = document.getElementById("submit_histogram_style");
 submit_histogram_style.onclick = function () {
 
-    var hide = document.getElementById("hide_histogram").checked;
+    var _hide = document.getElementById("hide_histogram").checked;
     var solid = document.getElementById("solid").checked;
     var gradient = document.getElementById("gradient").checked;
     var pattern = document.getElementById("pattern").checked;
@@ -701,14 +741,11 @@ submit_histogram_style.onclick = function () {
 
     //solid单色
     if (solid) {
-
-        console.log("name");
         histogram_style(false, true, null, null, null);
     }
 
     //渐变色
     else if (gradient) {
-        console.log("gradient");
         histogram_style(false, null, true, null, null);
     }
 
@@ -717,12 +754,30 @@ submit_histogram_style.onclick = function () {
         var pattern_img = document.getElementById('pattern_img');
         var selectedPatternImg = pattern_img.files;
         if (selectedPatternImg.length == 1) {
-            //console.log(selectedPatternImg[0]);
             var patternStyle = {
                 img: window.URL.createObjectURL(selectedPatternImg[0]),
                 repetition: "repeat"
             };
-            histogram_style(false, null, null, patternStyle, null);
+
+            console.log(hide.histogram);
+
+            if (hide.histogram == true) {
+                var img = new Image();
+                img.src = patternStyle.img;
+                img.onload = function () {
+                    var ptrn = ctx.createPattern(img, patternStyle.repetition);
+                    ctx.fillStyle = ptrn;
+
+                    style_before.pattern = patternStyle;
+                    style_before.solid = style_before.color1 = style_before.color2 = null;
+
+                }
+            }
+
+            else {
+                histogram_style(false, null, null, patternStyle, null);
+            }
+
         }
         else {
             alert("您没有导入纹理样式！");
@@ -740,7 +795,7 @@ submit_histogram_style.onclick = function () {
     }
 
     //隐藏
-    if (hide) {
+    if (_hide) {
         histogram_style(true, null, null, null, null);
         return;
     }
@@ -824,7 +879,7 @@ function paint_line_chart() {
 
     //先计算圆圈的坐标
     ctx.fillStyle = line_chart_style.dotColor;
-    for (var i = 0; i < n; i++) {
+    for (var i = 0; i < value.length; i++) {
 
         //计算矩形高度
         var dataHeight = (value[i] - result[0]) * (maxDataHeight / (result[1] - result[0]));
@@ -852,7 +907,7 @@ function paint_line_chart() {
     coor_x = originPoint.x;
 
     //绘制圆圈
-    for (var i = 0; i < n; i++) {
+    for (var i = 0; i < value.length; i++) {
 
         //计算矩形高度
         var dataHeight = (value[i] - result[0]) * (maxDataHeight / (result[1] - result[0]));
@@ -909,9 +964,10 @@ function setBackground() {
 //https://cloud.tencent.com/developer/article/1665737
 async function main() {
 
+    initial();
+
     await setBackground();
 
-    console.log("otherpaint");
     paint_y_axis();
     paint_x_axis();
 
@@ -950,6 +1006,22 @@ for (var i = 0; i < valueOrderType.length; i++) {
             originDataYear = JSON.parse(localStorage.getItem('year'));
             year = originDataYear;
             value = originDataValue;
+
+            //被筛选过的数据按照默认序号排序
+            if (filterMark != null) {
+                var newYear = [];
+                var newValue = [];
+
+                for (var i = 0; i < value.length; i++) {
+                    if (filterMark[i]) {
+                        newYear.push(year[i]);
+                        newValue.push(value[i]);
+                    }
+                }
+
+                year = newYear;
+                value = newValue;
+            }
         }
 
         //升序
@@ -1003,6 +1075,22 @@ for (var i = 0; i < yearOrderType.length; i++) {
             originDataYear = JSON.parse(localStorage.getItem('year'));
             year = originDataYear;
             value = originDataValue;
+
+            //被筛选过的数据按照默认序号排序
+            if (filterMark != null) {
+                var newYear = [];
+                var newValue = [];
+
+                for (var i = 0; i < value.length; i++) {
+                    if (filterMark[i]) {
+                        newYear.push(year[i]);
+                        newValue.push(value[i]);
+                    }
+                }
+
+                year = newYear;
+                value = newValue;
+            }
         }
 
         //升序
@@ -1034,3 +1122,139 @@ var quit = document.getElementById('quit');
 quit.onclick = function () {
     window.location.href = "./input.html";
 }
+
+
+//数据筛选
+document.getElementById("data_filtering").addEventListener("click", function () {
+    var type = document.getElementById("data_filtering").value;
+
+    console.log(type);
+
+    originDataValue = JSON.parse(localStorage.getItem('value'));
+    originDataYear = JSON.parse(localStorage.getItem('year'));
+    year = originDataYear;
+    value = originDataValue;
+    n = year.length;
+
+
+    //范围弹窗
+    var rangeOptionsInputs = document.querySelectorAll("#range_options input");
+    if (rangeOptionsInputs != null) {
+        var rangeOptions = document.getElementById("range_options");
+        rangeOptions.style.display = "none";
+    }
+
+    //不筛选
+    if (type == "none") {
+        dataFilterType.default = true;
+        filterMark = null;
+    }
+
+    else if (type == "above_avg" || type == "below_avg") {
+
+
+        var avg = (parseFloat(valueSum) / n);
+
+        console.log(valueSum, avg);
+
+        var newYear = [];
+        var newValue = [];
+        var selectedMark = [];
+
+        for (var i = 0; i < n; i++) {
+
+            //筛选大于均值的
+            if (type == "above_avg") {
+
+                if (value[i] >= avg) {
+                    newYear.push(year[i]);
+                    newValue.push(value[i]);
+                    selectedMark.push(true);
+
+                }
+                else {
+                    selectedMark.push(false);
+                }
+                continue;
+            }
+
+            //筛选小于均值的
+            if (type == "below_avg") {
+
+                if (value[i] <= avg) {
+                    newYear.push(year[i]);
+                    newValue.push(value[i]);
+                    selectedMark.push(true);
+                }
+                else {
+                    selectedMark.push(false);
+                }
+                continue;
+            }
+        }
+
+        console.log(newYear, newValue);
+
+        year = newYear;
+        value = newValue;
+        filterMark = selectedMark;
+        n = year.length;
+    }
+
+    else if (type == "range") {
+        var rangeOptions = document.getElementById("range_options");
+        var rangeOptionsStyle = rangeOptions.getAttribute("style");
+        console.log(rangeOptions);
+        console.log(rangeOptionsStyle);
+        rangeOptions.style.display = "block";
+        return;
+
+        //响应操作间下方
+    }
+    main();
+});
+
+
+var rangeOptions = document.getElementById("range_options");
+var rangeOptionsInputs = document.querySelectorAll("#range_options input");
+//OK按钮被按下之后
+rangeOptionsInputs[2].addEventListener("click", function () {
+
+    var rangeOptions = document.getElementById("range_options");
+    rangeOptions.style.display = "none";
+
+    var rangeMinValue = parseFloat(rangeOptionsInputs[0].value);
+    var rangeMaxValue = parseFloat(rangeOptionsInputs[1].value);
+
+    if (rangeMaxValue < rangeMinValue) {
+        alert("设置失败！！最大值不能小于最小值！！请重新设置");
+    }
+
+    else {
+        var newYear = [];
+        var newValue = [];
+        var selectedMark = [];
+
+        for (var i = 0; i < n; i++) {
+
+            //选择在范围内的
+            if (value[i] >= rangeMinValue && value[i] <= rangeMaxValue) {
+                newYear.push(year[i]);
+                newValue.push(value[i]);
+                selectedMark.push(true);
+            }
+            else {
+                selectedMark.push(false);
+            }
+        }
+
+        console.log(newYear, newValue);
+
+        year = newYear;
+        value = newValue;
+        filterMark = selectedMark;
+        n = year.length;
+
+        main();
+    }
+});
