@@ -77,10 +77,8 @@ canvas {
 
 .value_order {
     position: absolute;
-    /* top: 380px;
-    left: 50px; */
-    top: 50px;
-    left: 760px;
+    top: 380px;
+    left: 50px;
     width: 230px;
     /* height: 50px; */
     height: 100px;
@@ -104,10 +102,8 @@ canvas {
 
 .year_order {
     position: absolute;
-    /* top: 500px;
-    left: 50px; */
-    top: 50px;
-    left: 460px;
+    top: 500px;
+    left: 50px;
     width: 230px;
     /* height: 50px; */
     height: 100px;
@@ -131,70 +127,12 @@ canvas {
 
 #quit {
     position: absolute;
-    top: 50px;
-    left: 1050px;
+    top: 620px;
+    left: 50px;
     width: 100px;
     height: 30px;
     background-color: bisque;
     font-size: 20px;
     font-weight: 700;
     text-align: center;
-}
-
-
-.line_chart_style {
-    position: absolute;
-    left: 50px;
-    top: 400px;
-    width: 230px;
-    height: 530px;
-    background-color: rgb(245, 232, 198);
-}
-
-.line_chart_style .title {
-    padding: 5px;
-    font-size: 20px;
-    font-weight: 700;
-    text-align: center;
-    background-color: rgb(182, 176, 166);
-}
-
-.line_chart_style #hide_line_chart {
-    margin-left: 15px;
-    margin-top: 15px;
-}
-
-.line_chart_style .checkbox_style {
-    margin-left: 15px;
-    margin-top: 15px;
-}
-
-.line_chart_style label {
-    margin-left: 5px;
-}
-
-.line_chart_style #line_color,
-.line_chart_style #dot_color,
-.line_chart_style #font_color {
-    margin-left: 5px;
-}
-
-.line_chart_style #line_width,
-.line_chart_style #dot_size,
-.line_chart_style #font_size {
-    margin-left: 15px;
-    margin-top: 5px;
-}
-
-.line_chart_style #line_shape #dot_shape,
-.line_chart_style #font_family {
-    margin-left: 15px;
-    margin-top: 5px;
-}
-
-.line_chart_style #submit_line_chart_style {
-    margin-top: 10px;
-    margin-left: 90px;
-    width: 100px;
-    height: 30px;
 }

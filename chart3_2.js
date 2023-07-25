@@ -292,6 +292,19 @@ var line_chart_style = {
     fontSize: "18px",
 }
 
+var line_chart_style = {
+    hide: false,
+    lineColor: "black",
+    lineShape: "solid",
+    lineWidth: 2,
+    dotColor: "black",
+    dotShape: "arc",
+    dotSize: 5,
+    fontFamily: "宋体",
+    fontColor: "black",
+    fontSize: "12px",
+}
+
 //初始化
 function initial() {
 
