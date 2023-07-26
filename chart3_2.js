@@ -255,6 +255,9 @@ var dataWidth = 50;
 
 //关于柱状图
 var maxDataHeight; //原点至y轴最大刻度的距离
+var histogramTransparencyValue = 1;
+var histogramGradientDirection = 0;
+var histogramDimension = 3;
 
 //关于全局
 var defaultFontStyle = "20px serif";
@@ -278,9 +281,12 @@ var hide = {
 //保存柱状图之前的样式
 var style_before = {
     solid: null,
-    color1: "rgb(77, 163, 255)",
-    color2: "rgb(250, 184, 255)",
+    color1: "rgb(250, 184, 255)", //粉色
+    color2: "rgb(77, 163, 255)", //蓝色
+    direction: 0,
     pattern: null,
+    transparency: 1,
+    dimension: 3,
 };
 
 //折线图样式
@@ -365,18 +371,18 @@ function initial() {
 
 function resize() {
 
+    var canvasContainer = document.getElementById('canvasContainer');
+    var canvasContainerStyle = canvasContainer.getAttribute("style");
+
     //超出了默认宽度，添加滑动条
     if (canvas.width > defaultCanvasWidth) {
-        var canvasContainer = document.getElementById('canvasContainer');
-        var canvasContainerStyle = canvasContainer.getAttribute("style");
         var newCanvasContainerStyle = "width: 1000px; height: 568px; overflow-x: scroll;";
         canvasContainer.setAttribute("style", newCanvasContainerStyle);
     }
 
     else {
         canvas.width = defaultCanvasWidth;
-        var canvasContainer = document.getElementById('canvasContainer');
-        var canvasContainerStyle = canvasContainer.getAttribute("style");
+
         var newCanvasContainerStyle = "width: 1000px; height: 550px;";
         canvasContainer.setAttribute("style", newCanvasContainerStyle);
     }
@@ -498,8 +504,13 @@ function paint_histogram(solid, gradient, pattern, before, shadow, show_num_labe
 
     var coor_x = originPoint.x;
     var coor_y = originPoint.y;
+    var paintTransparency = 1;
+    var dim = 3;
 
     for (var i = 0; i < value.length; i++) {
+
+        if (i != 0)
+            ctx.restore();
 
         //计算矩形高度
         var dataHeight = (parseFloat(value[i]) - result[0]) * (maxDataHeight / (result[1] - result[0]));
@@ -507,25 +518,64 @@ function paint_histogram(solid, gradient, pattern, before, shadow, show_num_labe
 
         //https://developer.mozilla.org/zh-CN/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes
 
+        ctx.globalAlpha = histogramTransparencyValue;
+        dim = histogramDimension;
 
         //单色
         if (solid != null) {
             ctx.fillStyle = solid;
 
-            style_before.solid = solid;
+            /* style_before.solid = solid;
             style_before.color1 = style_before.color2 = style_before.pattern = null;
+            style_before.transparency = histogramTransparencyValue; */
         }
 
         //渐变色
         else if (gradient != null) {
-            var grd = ctx.createLinearGradient(coor_x + dataWidth / 2, coor_y, coor_x + dataWidth / 2, coor_y - dataHeight);
+
+            var grd;
+
+            //上至下
+            if (histogramGradientDirection == 0)
+                grd = ctx.createLinearGradient(coor_x, coor_y - dataHeight, coor_x, coor_y);
+
+            //下之上
+            if (histogramGradientDirection == 1)
+                grd = ctx.createLinearGradient(coor_x, coor_y, coor_x, coor_y - dataHeight);
+
+            //左至右
+            if (histogramGradientDirection == 2)
+                grd = ctx.createLinearGradient(coor_x, coor_y, coor_x + dataWidth, coor_y);
+
+            //右至左
+            if (histogramGradientDirection == 3)
+                grd = ctx.createLinearGradient(coor_x + dataWidth, coor_y, coor_x, coor_y);
+
+            //左下至右上↗
+            if (histogramGradientDirection == 4)
+                grd = ctx.createLinearGradient(coor_x, coor_y, coor_x + dataWidth, coor_y - dataHeight / 9);
+
+
+            //右上至左下↙
+            if (histogramGradientDirection == 5)
+                grd = ctx.createLinearGradient(coor_x + dataWidth, coor_y - dataHeight / 9, coor_x, coor_y);
+
+            //右下至左上↖
+            if (histogramGradientDirection == 6)
+                grd = ctx.createLinearGradient(coor_x + dataWidth, coor_y, coor_x, coor_y - dataHeight / 9);
+
+            //左上至右下↘
+            if (histogramGradientDirection == 7)
+                grd = ctx.createLinearGradient(coor_x, coor_y - dataHeight / 9, coor_x + dataWidth, coor_y,);
+
             grd.addColorStop(0, gradient.color1);
             grd.addColorStop(1, gradient.color2);
             ctx.fillStyle = grd;
 
-            style_before.solid = style_before.pattern = null;
-            style_before.color1 = gradient.color1;
-            style_before.color2 = gradient.color2;
+            /*  style_before.solid = style_before.pattern = null;
+             style_before.color1 = gradient.color1;
+             style_before.color2 = gradient.color2;
+             style_before.transparency = histogramTransparencyValue; */
         }
 
         //纹理样式
@@ -539,19 +589,62 @@ function paint_histogram(solid, gradient, pattern, before, shadow, show_num_labe
 
             style_before.pattern = pattern;
             style_before.solid = style_before.color1 = style_before.color2 = null;
-
+            style_before.transparency = histogramTransparencyValue;
         }
 
         //恢复之前的样式
         else if (before != null) {
 
+            dim = style_before.dimension;
+
+            if (hide.histogram == true)
+                ctx.globalAlpha = style_before.transparency;
+            else
+                ctx.globalAlpha = histogramTransparencyValue;
+
             //单色
-            if (style_before.solid != null)
+            if (style_before.solid != null) {
                 ctx.fillStyle = style_before.solid;
+            }
 
             //渐变色
             else if (style_before.color1 != null) {
-                var grd = ctx.createLinearGradient(coor_x + dataWidth / 2, coor_y, coor_x + dataWidth / 2, coor_y - dataHeight);
+
+                var grd;
+
+                //上至下
+                if (style_before.direction == 0)
+                    grd = ctx.createLinearGradient(coor_x, coor_y - dataHeight, coor_x, coor_y);
+
+                //下之上
+                if (style_before.direction == 1)
+                    grd = ctx.createLinearGradient(coor_x, coor_y, coor_x, coor_y - dataHeight);
+
+                //左至右
+                if (style_before.direction == 2)
+                    grd = ctx.createLinearGradient(coor_x, coor_y, coor_x + dataWidth, coor_y);
+
+                //右至左
+                if (style_before.direction == 3)
+                    grd = ctx.createLinearGradient(coor_x + dataWidth, coor_y, coor_x, coor_y);
+
+                //左下至右上↗
+                if (style_before.direction == 4)
+                    grd = ctx.createLinearGradient(coor_x, coor_y, coor_x + dataWidth, coor_y - dataHeight / 9);
+
+                //右上至左下↙
+                if (style_before.direction == 5)
+                    grd = ctx.createLinearGradient(coor_x + dataWidth, coor_y - dataHeight / 9, coor_x, coor_y);
+
+                //右下至左上↖
+                if (style_before.direction == 6)
+                    grd = ctx.createLinearGradient(coor_x + dataWidth, coor_y, coor_x, coor_y - dataHeight / 9);
+
+                //左上至右下↘
+                if (style_before.direction == 7)
+                    grd = ctx.createLinearGradient(coor_x, coor_y - dataHeight / 9, coor_x + dataWidth, coor_y,);
+
+                //圆形渐变
                 grd.addColorStop(0, style_before.color1);
                 grd.addColorStop(1, style_before.color2);
                 ctx.fillStyle = grd;
@@ -564,39 +657,124 @@ function paint_histogram(solid, gradient, pattern, before, shadow, show_num_labe
                 var ptrn = ctx.createPattern(img, style_before.pattern.repetition);
                 ctx.fillStyle = ptrn;
             }
+
         }
 
         //默认
         else {
+            dim = 3;
+
             var grd = ctx.createLinearGradient(coor_x + dataWidth / 2, coor_y, coor_x + dataWidth / 2, coor_y - dataHeight);
+
             grd.addColorStop(0, "rgb(77, 163, 255)");
             grd.addColorStop(1, "rgb(250, 184, 255)");
             ctx.fillStyle = grd;
+            ctx.globalAlpha = 1;
 
             style_before.solid = null;
             style_before.color1 = "rgb(77, 163, 255)";
             style_before.color2 = "rgb(250, 184, 255)";
-        }
+            style_before.transparency = 1;
+            style_before.dimension = 2;
 
-        //绘制矩形
-        ctx.beginPath();
-        ctx.moveTo(coor_x, coor_y);
-        ctx.lineTo(coor_x, coor_y - dataHeight);
-        ctx.lineTo(coor_x + dataWidth, coor_y - dataHeight);
-        ctx.lineTo(coor_x + dataWidth, coor_y);
-        ctx.lineTo(coor_x, coor_y);
-        ctx.fill();
+        }
 
         //设置阴影
         if (shadow) {
 
-            //设置阴影参数
-            ctx.shadowOffsetX = 2;
-            ctx.shadowOffsetY = 2;
-            ctx.shadowBlur = 2;
-            ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
 
-            //绘制阴影
+
+            //尝试立体效果
+            if (dim == 3) {
+                var oldGlobalAlpha = ctx.globalAlpha;
+                var newglobalAlpha = parseFloat(ctx.globalAlpha) == 0.4 ? oldGlobalAlpha : oldGlobalAlpha - 0.3;
+
+                //中间
+                ctx.globalAlpha = oldGlobalAlpha + 0.1
+                ctx.shadowOffsetX = 4;
+                ctx.shadowOffsetY = 0;
+                ctx.shadowBlur = 2;
+                ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+
+                ctx.beginPath();
+                ctx.moveTo(coor_x + 5, coor_y);
+                ctx.lineTo(coor_x + 5, coor_y - dataHeight + 10);
+                ctx.lineTo(coor_x + dataWidth, coor_y - dataHeight + 10);
+                ctx.lineTo(coor_x + dataWidth, coor_y);
+                ctx.lineTo(coor_x, coor_y);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+
+                //左边
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                ctx.shadowBlur = 2;
+                ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+                //ctx.globalAlpha = newglobalAlpha;
+                ctx.globalAlpha = oldGlobalAlpha + 0.3;
+
+                ctx.beginPath();
+                ctx.moveTo(coor_x, coor_y);
+                ctx.lineTo(coor_x, coor_y - dataHeight);
+                ctx.lineTo(coor_x + dataWidth - 40, coor_y - dataHeight + 10);
+                ctx.lineTo(coor_x + dataWidth - 40, coor_y);
+                ctx.lineTo(coor_x, coor_y);
+                ctx.fill();
+
+                //上面
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                ctx.shadowBlur = 2;
+                ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+                ctx.globalAlpha = oldGlobalAlpha + 0.2;
+                ctx.beginPath();
+                ctx.moveTo(coor_x, coor_y - dataHeight);
+                ctx.lineTo(coor_x + dataWidth - 10, coor_y - dataHeight);
+                ctx.lineTo(coor_x + dataWidth, coor_y - dataHeight + 10);
+                ctx.lineTo(coor_x + 10, coor_y - dataHeight + 10);
+                ctx.fill();
+
+                ctx.globalAlpha = oldGlobalAlpha;
+
+
+
+                //恢复阴影设置参数
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                ctx.shadowBlur = 0;
+                ctx.shadowColor = null;
+                ctx.globalAlpha = 1;
+            }
+
+            //设置阴影参数
+            if (dim == 2) {
+                ctx.shadowOffsetX = 5;
+                ctx.shadowOffsetY = 2;
+                ctx.shadowBlur = 2;
+                ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+
+                //绘制柱状图
+                ctx.beginPath();
+                ctx.moveTo(coor_x, coor_y);
+                ctx.lineTo(coor_x, coor_y - dataHeight);
+                ctx.lineTo(coor_x + dataWidth, coor_y - dataHeight);
+                ctx.lineTo(coor_x + dataWidth, coor_y);
+                ctx.lineTo(coor_x, coor_y);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+
+                //恢复阴影设置参数
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                ctx.shadowBlur = 0;
+                ctx.shadowColor = null;
+            }
+        }
+
+        else {
+
+
+            //绘制矩形
             ctx.beginPath();
             ctx.moveTo(coor_x, coor_y);
             ctx.lineTo(coor_x, coor_y - dataHeight);
@@ -604,103 +782,204 @@ function paint_histogram(solid, gradient, pattern, before, shadow, show_num_labe
             ctx.lineTo(coor_x + dataWidth, coor_y);
             ctx.lineTo(coor_x, coor_y);
             ctx.fill();
+            ctx.globalAlpha = 1;
 
-            //恢复阴影设置参数
             ctx.shadowOffsetX = 0;
             ctx.shadowOffsetY = 0;
             ctx.shadowBlur = 0;
             ctx.shadowColor = null;
+            ctx.globalAlpha = 1;
         }
 
         //显示产量的数字
         if (show_num_label) {
             ctx.textAlign = "center";
-            ctx.fillStyle = "black"
+            ctx.fillStyle = "black";
             ctx.font = defaultFontStyle;
             ctx.fillText(value[i].toString(), coor_x + dataWidth / 2, coor_y - dataHeight - 15);
+
         }
+
 
         //递增
         coor_x += (dataWidth + dataMarginRight);
     }
 
+
+    ctx.globalAlpha = 1;
+
 }
 
-//先选择样式再绘画的接口
+
 async function histogram_style(_hide, solid, gradient, pattern, before) {
 
+    //重绘背景
+    await setBackground();
+    ctx.fillStyle = "black";
+    //重绘坐标轴
+    paint_y_axis();
+    paint_x_axis();
 
-    //隐藏柱状图
-    if (_hide == true) {
+    //重绘折状图
+    paint_line_chart();
 
-        //重绘背景
-        await setBackground();
 
-        //重绘坐标轴
-        paint_y_axis();
-        paint_x_axis();
+    //单色
+    if (solid != null) {
 
-        //重绘折状图
-        paint_line_chart();
+        solid = document.getElementById("solid_color").value;
+        style_before.solid = solid;
+        style_before.color1 = style_before.color2 = style_before.pattern = null;
+        style_before.transparency = histogramTransparencyValue;
+        style_before.dimension = histogramDimension;
+    }
+
+    //渐变色
+    if (gradient != null) {
+
+        var grd_color1 = document.getElementById("grd_color1").value;
+        var grd_color2 = document.getElementById("grd_color2").value;
+        gradient = { color1: grd_color1, color2: grd_color2 };
+
+        style_before.solid = style_before.pattern = null;
+        style_before.color1 = gradient.color1;
+        style_before.color2 = gradient.color2;
+        style_before.transparency = histogramTransparencyValue;
+        style_before.direction = histogramGradientDirection;
+        style_before.dimension = histogramDimension;
+    }
+
+
+    //图片纹理
+    if (pattern != null) {
+        //https://www.twle.cn/l/yufei/canvas/canvas-basic-pattern.html
+        var img = new Image();
+        img.src = pattern.img;
+
+        //加载好了才绘柱状图
+        img.onload = function () {
+            if (hide.histogram == false)
+                paint_histogram(null, null, pattern, null, true, true);
+        };
+
         return;
+    }
 
+    //恢复之前的样式
+    if (before != null && style_before.pattern != null) {
+        var img = new Image();
+        img.src = style_before.pattern.img;
+
+        img.onload = function () {
+            if (hide.histogram == false)
+                paint_histogram(null, null, null, before, true, true);
+        };
+
+        return;
     }
 
     else {
 
-        //单色
-        if (solid != null) {
+        if (before != null && style_before.color1 != null)
+            style_before.direction = histogramGradientDirection;
 
-            var solid_color = document.getElementById("solid_color").value;
-            paint_histogram(solid_color, null, null, null, false, false);
+        console.log("这里");
+        if (hide.histogram == false)
+            paint_histogram(solid, gradient, null, before, true, true);
+    }
+
+
+}
+
+
+if (false) {
+    //先选择样式再绘画的接口
+    async function histogram_style1(_hide, solid, gradient, pattern, before) {
+
+
+        //隐藏柱状图
+        if (_hide == true) {
+
+            //重绘背景
+            await setBackground();
+
+            //重绘坐标轴
+            paint_y_axis();
+            paint_x_axis();
+
+            //重绘折状图
+            paint_line_chart();
+            return;
+
         }
 
-        //渐变色
-        else if (gradient != null) {
+        else {
 
-            var grd_color1 = document.getElementById("grd_color1").value;
-            var grd_color2 = document.getElementById("grd_color2").value;
-            var gradient_color = { color1: grd_color1, color2: grd_color2 };
-            paint_histogram(null, gradient_color, null, null, false, false);
-        }
 
-        //纹理样式
-        else if (pattern != null) {
-            //https://www.twle.cn/l/yufei/canvas/canvas-basic-pattern.html
-            var img = new Image();
-            img.src = pattern.img;
+            //单色
+            if (solid != null) {
 
-            //加载好了才绘柱状图
-            img.onload = function () {
-                if (hide.histogram == false)
-                    paint_histogram(null, null, pattern, null, false, false);
-            };
+                var solid_color = document.getElementById("solid_color").value;
+                paint_histogram(solid_color, null, null, null, true, false);
+            }
 
-        }
+            //渐变色
+            else if (gradient != null) {
 
-        //恢复之前的样式
-        else if (before != null) {
+                var grd_color1 = document.getElementById("grd_color1").value;
+                var grd_color2 = document.getElementById("grd_color2").value;
+                var gradient_color = { color1: grd_color1, color2: grd_color2 };
+                paint_histogram(null, gradient_color, null, null, true, false);
+            }
 
-            if (style_before.pattern != null) {
+            //纹理样式
+            else if (pattern != null) {
+                //https://www.twle.cn/l/yufei/canvas/canvas-basic-pattern.html
                 var img = new Image();
-                img.src = style_before.pattern.img;
+                img.src = pattern.img;
 
+                //加载好了才绘柱状图
                 img.onload = function () {
                     if (hide.histogram == false)
-                        paint_histogram(null, null, null, before, true, true);
+                        paint_histogram(null, null, pattern, null, true, false);
                 };
+
             }
 
+            //恢复之前的样式
+            else if (before != null) {
+
+                if (style_before.pattern != null) {
+                    var img = new Image();
+                    img.src = style_before.pattern.img;
+
+                    img.onload = function () {
+                        if (hide.histogram == false)
+                            paint_histogram(null, null, null, before, true, true);
+                    };
+                }
+
+                else {
+                    paint_histogram(null, null, null, before, true, true);
+                }
+            }
+
+            //默认颜色
             else {
-                paint_histogram(null, null, null, before, true, true);
+                //重绘背景
+                await setBackground();
+
+                //重绘坐标轴
+                paint_y_axis();
+                paint_x_axis();
+
+
+                paint_histogram(null, null, null, null, true, true);
+                //重绘折状图
+                paint_line_chart();
             }
-        }
 
-        //默认颜色
-        else {
-            paint_histogram(null, null, null, null, false, false);
         }
-
     }
 }
 
@@ -715,6 +994,61 @@ hide_histogram.onclick = function () {
 
 }
 
+//柱状图颜色透明度
+var histogramTransparency = document.getElementById("histogram_transparency");
+histogramTransparency.addEventListener("change", function () {
+    histogramTransparencyValue = histogramTransparency.value;
+    histogram_style(hide.histogram, null, null, null, true);
+})
+
+//渐变颜色方向
+var grdDirectionOptions = document.getElementById("gradient_direction");
+grdDirectionOptions.addEventListener("change", function () {
+
+    if (grdDirectionOptions.value == "up_down")
+        histogramGradientDirection = 0;
+
+    else if (grdDirectionOptions.value == "down_up")
+        histogramGradientDirection = 1;
+
+    else if (grdDirectionOptions.value == "left_right")
+        histogramGradientDirection = 2;
+
+    else if (grdDirectionOptions.value == "right_left")
+        histogramGradientDirection = 3;
+
+    else if (grdDirectionOptions.value == "bottomLeft_topRight")
+        histogramGradientDirection = 4;
+
+    else if (grdDirectionOptions.value == "topRight_bottomLeft")
+        histogramGradientDirection = 5;
+
+    else if (grdDirectionOptions.value == "bottomRight_topLeft")
+        histogramGradientDirection = 6;
+
+    else if (grdDirectionOptions.value == "topLeft_bottomRight")
+        histogramGradientDirection = 7;
+
+    if (style_before.color1 != null && style_before.color2 != null) {
+        histogram_style(hide.histogram, null, null, null, true);
+    }
+})
+
+var dimensionOptions = document.getElementById("histrogram_dimension");
+dimensionOptions.addEventListener("change", function () {
+
+    if (dimensionOptions.value == "3D") {
+        histogramDimension = 3;
+        style_before.dimension = 3;
+    }
+
+    else if (dimensionOptions.value == "2D") {
+        histogramDimension = 2;
+        style_before.dimension = 2;
+    }
+
+    histogram_style(hide.histogram, null, null, null, true);
+})
 
 /* 柱状图样式设置，只能选一个 */
 //https://blog.csdn.net/m0_64074850/article/details/125894773
@@ -743,13 +1077,17 @@ submit_histogram_style.onclick = function () {
     var pattern = document.getElementById("pattern").checked;
     var _default = document.getElementById("default").checked;
 
+
+
     //solid单色
     if (solid) {
+        console.log("单色");
         histogram_style(false, true, null, null, null);
     }
 
     //渐变色
     else if (gradient) {
+        console.log("渐变");
         histogram_style(false, null, true, null, null);
     }
 
@@ -763,7 +1101,7 @@ submit_histogram_style.onclick = function () {
                 repetition: "repeat"
             };
 
-            console.log(hide.histogram);
+            console.log("纹理");
 
             if (hide.histogram == true) {
                 var img = new Image();
@@ -790,6 +1128,11 @@ submit_histogram_style.onclick = function () {
 
     //默认
     else if (_default) {
+        var dimensionOptions = document.getElementById("histrogram_dimension");
+        dimensionOptions.value = "3D";
+        histogramDimension = 3;
+        histogramTransparency.value = 1;
+        histogramTransparencyValue = 1;
         histogram_style(false, null, null, null, null);
     }
 
@@ -798,11 +1141,13 @@ submit_histogram_style.onclick = function () {
         alert("设置失败，您没有勾选其中一种！");
     }
 
-    //隐藏
+    /* //隐藏
     if (_hide) {
         histogram_style(true, null, null, null, null);
         return;
-    }
+    } */
+
+
 }
 
 //计算每个数据的占比%
@@ -814,7 +1159,6 @@ function count_proportion() {
         sum += parseFloat(value[i]);
 
     for (var i = 0; i < value.length; i++) {
-        console.log(sum / value[i]);
         prop.push(((parseFloat(value[i]) / sum) * 100).toFixed(2));
     }
 
@@ -874,6 +1218,7 @@ document.getElementById("font_size").addEventListener("input", function () {
 
 //绘制折线图
 function paint_line_chart() {
+
 
     if (line_chart_style.hide == true) {
         return;
@@ -959,6 +1304,7 @@ function setBackground() {
             ctx.globalAlpha = 0.5;
             ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
             ctx.globalAlpha = 1;
+            console.log("done");
             resolve();
         };
     });
@@ -969,6 +1315,7 @@ function setBackground() {
 //https://cloud.tencent.com/developer/article/1665737
 async function main() {
 
+
     initial();
 
     await setBackground();
@@ -977,13 +1324,14 @@ async function main() {
     paint_x_axis();
 
 
+    paint_line_chart();
     if (hide.histogram == false)
         histogram_style(false, null, null, null, true);
-    paint_line_chart();
 }
 
-initial();
+//initial();
 main();
+
 
 
 
@@ -1130,10 +1478,10 @@ quit.onclick = function () {
 
 
 //数据筛选
-document.getElementById("data_filtering").addEventListener("click", function () {
+var dataFileringOptions = document.getElementById("data_filtering");
+dataFileringOptions.addEventListener("click", function () {
     var type = document.getElementById("data_filtering").value;
 
-    console.log(type);
 
     originDataValue = JSON.parse(localStorage.getItem('value'));
     originDataYear = JSON.parse(localStorage.getItem('year'));
@@ -1142,17 +1490,25 @@ document.getElementById("data_filtering").addEventListener("click", function () 
     n = year.length;
 
 
+
     //范围弹窗
-    var rangeOptionsInputs = document.querySelectorAll("#range_options input");
-    if (rangeOptionsInputs != null) {
-        var rangeOptions = document.getElementById("range_options");
-        rangeOptions.style.display = "none";
+    if (document.getElementById("range_options").style.display == "block" ||
+        document.getElementById("percentage_options").style.display == "block") {
+        document.getElementById("range_options").style.display = "none";
+        document.getElementById("percentage_options").style.display = "none";
+        dataFileringOptions.value = "none";
+
+        return;
     }
+
+    //dataFileringOptions.value = "none";
+
 
     //不筛选
     if (type == "none") {
         dataFilterType.default = true;
         filterMark = null;
+        return;
     }
 
     else if (type == "above_avg" || type == "below_avg") {
@@ -1209,13 +1565,18 @@ document.getElementById("data_filtering").addEventListener("click", function () 
     else if (type == "range") {
         var rangeOptions = document.getElementById("range_options");
         var rangeOptionsStyle = rangeOptions.getAttribute("style");
-        console.log(rangeOptions);
-        console.log(rangeOptionsStyle);
         rangeOptions.style.display = "block";
         return;
 
         //响应操作间下方
     }
+
+    else if (type == "percentage") {
+
+        document.getElementById("percentage_options").style.display = "block";
+        return;
+    }
+
     main();
 });
 
@@ -1262,4 +1623,29 @@ rangeOptionsInputs[2].addEventListener("click", function () {
 
         main();
     }
+});
+
+document.getElementById("select_percentage").addEventListener("input", function () {
+    document.getElementById("percentage_options").style.display = "none";
+    var percentage = document.getElementById("select_percentage").value;
+    var newYear = [];
+    var newValue = [];
+    var selectedMark = [];
+    var orderedValue = [...value];
+    orderedValue.sort(function (a, b) { return b - a });
+    for (var i = 0; i < n; i++) {
+        if (parseInt(value[i]) >= parseInt(orderedValue[Math.floor(n * percentage / 100 - 1)])) {
+            newYear.push(year[i]);
+            newValue.push(value[i]);
+            selectedMark.push(true);
+        } else {
+            selectedMark.push(false);
+        }
+    }
+    year = newYear;
+    value = newValue;
+    filterMark = selectedMark;
+    n = year.length;
+
+    main();
 });

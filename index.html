@@ -31,9 +31,25 @@
             <input type="color" id="grd_color1">
             <input type="color" id="grd_color2">
         </div>
+
+        <div class="checkbox_style">
+            <label for="gradient_direction">渐变方向：</label>
+            <select name="gradient_direction" id="gradient_direction">
+                <option value="up_down" selected>上至下↑</option>
+                <option value="down_up">下至上↓</option>
+                <option value="left_right">左至右→</option>
+                <option value="right_left">右至左←</option>
+                <option value="bottomLeft_topRight">左下至右上↗</option>
+                <option value="topRight_bottomLeft">右上至左下↙</option>
+                <option value="bottomRight_topLeft">右下至左上↖</option>
+                <option value="topLeft_bottomRight">左上至右下↘</option>
+            </select>
+        </div>
+
+
         <div class="checkbox_style">
             <input type="checkbox" name="pattern" id="pattern">
-            <label for="pattern">样式</label>
+            <label for="pattern">纹理图片</label>
 
         </div>
         <input type="file" name="pattern_img" id="pattern_img" value="选择文件">
@@ -43,11 +59,30 @@
             <label for="default">默认</label>
         </div>
 
+        <!-- <div class="checkbox_style">
+            <label for="histogram_transparency ">透明度</label>
+            <input type="number" id="histogram_transparency" min="0" max="1" step="0.1" value="1">
+        </div> -->
+
+        <div class="checkbox_style">
+            <label for="histogram_transparency ">透明度</label>
+            <input type="range" id="histogram_transparency" min="0" max="1" step="0.1" value="1">
+        </div>
+
+        <div class="checkbox_style">
+            <label for="histrogram_dimension">维度：</label>
+            <select name="histrogram_dimension" id="histrogram_dimension">
+                <option value="3D" selected>3D</option>
+                <option value="2D">2D</option>
+            </select>
+        </div>
+
         <div class="set_histogram_style">
             <input type="submit" value="设置" id="submit_histogram_style">
         </div>
 
     </div>
+
 
     <div class="line_chart_style">
         <div class="title">折线图样式设置</div>
@@ -132,6 +167,7 @@
                 <option value="above_avg">均值之上</option>
                 <option value="below_avg">均值之下</option>
                 <option value="range" id="range">范围</option>
+                <option value="percentage" id="percentage">百分比</option>
             </select>
             <div id="range_options" style="display: none;">
                 最小值: <input type="number" name="min_value" id="min_range_value">
@@ -141,6 +177,15 @@
             </div>
         </div>
 
+        <div id="percentage_options" style="display: none;">
+            <select name="select_percentage" id="select_percentage">
+                <option value="100" selected>前100%</option>
+                <option value="80">前80%</option>
+                <option value="60">前60%</option>
+                <option value="40">前40%</option>
+                <option value="20">前20%</option>
+            </select>
+        </div>
     </div>
 
 
