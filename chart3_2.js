@@ -689,50 +689,65 @@ function paint_histogram(solid, gradient, pattern, before, shadow, show_num_labe
                 var oldGlobalAlpha = ctx.globalAlpha;
                 var newglobalAlpha = parseFloat(ctx.globalAlpha) == 0.4 ? oldGlobalAlpha : oldGlobalAlpha - 0.3;
 
-                //中间
-                ctx.globalAlpha = oldGlobalAlpha + 0.1
-                ctx.shadowOffsetX = 4;
-                ctx.shadowOffsetY = 0;
-                ctx.shadowBlur = 2;
-                ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+                if (dataHeight > 10) {
+                    //中间
+                    ctx.globalAlpha = oldGlobalAlpha + 0.1
+                    ctx.shadowOffsetX = 4;
+                    ctx.shadowOffsetY = 0;
+                    ctx.shadowBlur = 2;
+                    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
 
-                ctx.beginPath();
-                ctx.moveTo(coor_x + 5, coor_y);
-                ctx.lineTo(coor_x + 5, coor_y - dataHeight + 10);
-                ctx.lineTo(coor_x + dataWidth, coor_y - dataHeight + 10);
-                ctx.lineTo(coor_x + dataWidth, coor_y);
-                ctx.lineTo(coor_x, coor_y);
-                ctx.fill();
-                ctx.globalAlpha = 1;
 
-                //左边
-                ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 0;
-                ctx.shadowBlur = 2;
-                ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
-                //ctx.globalAlpha = newglobalAlpha;
-                ctx.globalAlpha = oldGlobalAlpha + 0.3;
+                    ctx.beginPath();
+                    ctx.moveTo(coor_x + 5, coor_y);
+                    ctx.lineTo(coor_x + 5, coor_y - dataHeight + 10);
+                    ctx.lineTo(coor_x + dataWidth, coor_y - dataHeight + 10);
+                    ctx.lineTo(coor_x + dataWidth, coor_y);
+                    ctx.lineTo(coor_x, coor_y);
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
 
-                ctx.beginPath();
-                ctx.moveTo(coor_x, coor_y);
-                ctx.lineTo(coor_x, coor_y - dataHeight);
-                ctx.lineTo(coor_x + dataWidth - 40, coor_y - dataHeight + 10);
-                ctx.lineTo(coor_x + dataWidth - 40, coor_y);
-                ctx.lineTo(coor_x, coor_y);
-                ctx.fill();
 
-                //上面
-                ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 0;
-                ctx.shadowBlur = 2;
-                ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
-                ctx.globalAlpha = oldGlobalAlpha + 0.2;
-                ctx.beginPath();
-                ctx.moveTo(coor_x, coor_y - dataHeight);
-                ctx.lineTo(coor_x + dataWidth - 10, coor_y - dataHeight);
-                ctx.lineTo(coor_x + dataWidth, coor_y - dataHeight + 10);
-                ctx.lineTo(coor_x + 10, coor_y - dataHeight + 10);
-                ctx.fill();
+                    //左边
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.shadowBlur = 2;
+                    ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+                    //ctx.globalAlpha = newglobalAlpha;
+                    ctx.globalAlpha = oldGlobalAlpha + 0.3;
+
+                    ctx.beginPath();
+                    ctx.moveTo(coor_x, coor_y);
+                    ctx.lineTo(coor_x, coor_y - dataHeight);
+                    ctx.lineTo(coor_x + dataWidth - 40, coor_y - dataHeight + 10);
+                    ctx.lineTo(coor_x + dataWidth - 40, coor_y);
+                    ctx.lineTo(coor_x, coor_y);
+                    ctx.fill();
+
+                    //上面
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.shadowBlur = 2;
+                    ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+                    ctx.globalAlpha = oldGlobalAlpha + 0.2;
+                    ctx.beginPath();
+                    ctx.moveTo(coor_x, coor_y - dataHeight);
+                    ctx.lineTo(coor_x + dataWidth - 10, coor_y - dataHeight);
+                    ctx.lineTo(coor_x + dataWidth, coor_y - dataHeight + 10);
+                    ctx.lineTo(coor_x + 10, coor_y - dataHeight + 10);
+                    ctx.fill();
+                }
+
+                //按二维来画
+                else {
+                    ctx.beginPath();
+                    ctx.moveTo(coor_x, coor_y);
+                    ctx.lineTo(coor_x, coor_y - dataHeight);
+                    ctx.lineTo(coor_x + dataWidth, coor_y - dataHeight);
+                    ctx.lineTo(coor_x + dataWidth, coor_y);
+                    ctx.lineTo(coor_x, coor_y);
+                    ctx.fill();
+                }
 
                 ctx.globalAlpha = oldGlobalAlpha;
 
