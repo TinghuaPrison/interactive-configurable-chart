@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Canvas </title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- 上面那栏 -->
+    <div class="flex">
+        <div class="inputBox">
+            <div class="title"> 新增数据 </div>
+            <div class="spaceRow"></div>
+            <div><input type="text" id="input_year" placeholder="年份"></div>
+            <div><input type="number" id="input_value" placeholder="产量"></div>
+            <div>
+                <button id="insert" value="添加" onclick="addDataToTable()"> 添加 </button>
+                <button id="get_chart" value="生成图表" onclick="getChart()"> 生成图表 </button>
+                <button id="clear_data" value=" 清空表单数据" onclick="clearTable()"> 清空表单数据 </button>
+            </div>
+        </div>
+
+        <div class="histogramSetting moveLeft17">
+            <div class="title"> 柱状图样式设置 </div>
+            <div class="flex">
+                <div>
+                    <div class="width110">
+                        <input type="checkbox" name="default" id="default">
+                        <label for="default"> 默认样式 </label>
+                    </div>
+                    <div class="width110">
+                        <input type="checkbox" name="solid" id="solid">
+                        <label for="solid"> 单色 </label>
+                        <input type="color" id="solid_color" class="colorWidth">
+                    </div>
+                    <div class="width110">
+                        <label for="histrogram_dimension" class="moveLeft4"> 维度： </label>
+                        <select name="histrogram_dimension" id="histrogram_dimension">
+                            <option value="3D" selected>3D</option>
+                            <option value="2D">2D</option>
+                        </select>
+                    </div>
+
+                </div>
+                <div class="moveLeft17">
+                    <div class="width220">
+                        <input type="checkbox" name="pattern" id="pattern">
+                        <label for="pattern"> 纹理 </label>
+                        <input type="file" name="pattern_img" id="pattern_img" value="选择文件" class="inputFileWidth">
+                    </div>
+                    <div class="width220 gradientSetting">
+                        <input type="checkbox" name="gradient" id="gradient">
+                        <label for="gradient"> 渐变 </label>
+                        <input type="color" id="grd_color1" class="colorWidth">
+                        <input type="color" id="grd_color2" class="colorWidth">
+                        <select name="gradient_direction" id="gradient_direction">
+                            <option value="up_down" selected>上至下↑</option>
+                            <option value="down_up">下至上↓</option>
+                            <option value="left_right">左至右→</option>
+                            <option value="right_left">右至左←</option>
+                            <option value="bottomLeft_topRight">左下至右上↗</option>
+                            <option value="topRight_bottomLeft">右上至左下↙</option>
+                            <option value="bottomRight_topLeft">右下至左上↖</option>
+                            <option value="topLeft_bottomRight">左上至右下↘</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="histogram_transparency" class="moveLeft4">透明度：</label>
+                        <input type="range" id="histogram_transparency" min="0" max="1" step="0.1" value="1"
+                            class="transparencyRange">
+                        <button value="设置" id="submit_histogram_style" class="moveLeft17"> 设置 </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lineGraphSetting moveLeft17">
+            <div class="title"> 折线图样式设置 </div>
+            <div class="flex">
+                <div>
+                    <div class="width">
+                        <label for="line_color">线条颜色：</label>
+                        <input type="color" name="line_color" id="line_color">
+                    </div>
+                    <div class="width">
+                        <label for="line_shape">线条形状：</label>
+                        <select name="line_shape" id="line_shape">
+                            <option value="solid" selected>实线</option>
+                            <option value="dashed">虚线</option>
+                        </select>
+                    </div>
+                    <div class="width">
+                        <label for="line_width">线条宽度：</label>
+                        <input type="range" name="line_width" id="line_width" min="1" max="5" value="2"
+                            class="rangeWidth">
+                    </div>
+                </div>
+                <div class="moveLeft17">
+                    <div class="width">
+                        <label for="dot_color">点的颜色：</label>
+                        <input type="color" name="dot_color" id="dot_color">
+                    </div>
+                    <div class="width">
+                        <label for="dot_shape">点的形状：</label>
+                        <select name="dot_shape" id="dot_shape">
+                            <option value="arc" selected>圆形</option>
+                            <option value="rect">矩形</option>
+                        </select>
+                    </div>
+                    <div class="width">
+                        <label for="dot_size">点的大小：</label>
+                        <input type="range" name="dot_size" id="dot_size" min="2" max="10" value="5" class="rangeWidth">
+                    </div>
+                </div>
+                <div class="moveLeft17">
+                    <div class="width">
+                        <label for="font_color">字体颜色：</label>
+                        <input type="color" name="font_color" id="font_color">
+                    </div>
+                    <div class="width">
+                        <label for="font_family">字体：</label>
+                        <select name="font_family" id="font_family">
+                            <option value="宋体" selected>宋体</option>
+                            <option value="Arial">Arial</option>
+                            <option value="Helvetica">Helvetica</option>
+                        </select>
+                    </div>
+                    <div class="width">
+                        <label for="font_size">字体大小：</label>
+                        <input type="range" name="font_size" id="font_size" min="10" max="25" value="18"
+                            class="rangeWidth">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="moveLeft17">
+            <div class="valueOrderSetting">
+                <div class="title"> 产量排序设置 </div>
+                <div class="flex">
+                    <div class="grow">
+                        <input type="checkbox" name="value_original" id="value_original">
+                        <label for="value_original"> 默认 </label>
+                    </div>
+                    <div class="grow">
+                        <input type="checkbox" name="value_ascending" id="value_ascending">
+                        <label for="value_ascending"> 升序 </label>
+                    </div>
+                    <div class="grow">
+                        <input type="checkbox" name="value_descending" id="value_descending">
+                        <label for="value_descending"> 降序 </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="spaceRow"></div>
+
+            <div class="yearOrderSetting">
+                <div class="title"> 年份排序设置 </div>
+                <div class="flex">
+                    <div class="grow">
+                        <input type="checkbox" name="year_original" id="year_original">
+                        <label for="year_original"> 默认 </label>
+                    </div>
+                    <div class="grow">
+                        <input type="checkbox" name="year_ascending" id="year_ascending">
+                        <label for="year_ascending"> 升序 </label>
+                    </div>
+                    <div class="grow">
+                        <input type="checkbox" name="year_descending" id="year_descending">
+                        <label for="year_descending">降序</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="spaceRow"></div>
+
+    <div class="flex">
+        <!-- 表格那栏 -->
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th> 年份 </th>
+                        <th> 产量 </th>
+                        <th> 操作 </th>
+                    </tr>
+                </thead>
+                <tbody id="table"></tbody>
+            </table>
+        </div>
+
+        <div class="moveLeft17">
+            <div class="flex">
+                <div class=" width110">
+                    <input type="checkbox" name="hide_histogram" id="hide_histogram">
+                    <label for="hide_histogram"> 隐藏柱状图 </label>
+                </div>
+                <div class="width110">
+                    <input type="checkbox" name="hide_line_chart" id="hide_line_chart">
+                    <label for="hide_line_chart"> 隐藏折线图 </label>
+                </div>
+            </div>
+
+            <div id="canvasContainer" style="width: 1000px; height: 600px;">
+                <canvas id="myCanvas" width="1000" height="568"></canvas>
+            </div>
+        </div>
+
+        <div class="dataSetting moveLeftxx">
+            <div class="title"> 数据筛选与过滤 </div>
+            <div class="flex">
+                <div class="grow"></div>
+                <div class="grow">
+                    <label for="data_filtering"> 方式：</label>
+                    <select name="data_filtering" id="data_filtering">
+                        <option value="none" selected> 无 </option>
+                        <option value="above_avg"> 均值之上 </option>
+                        <option value="below_avg"> 均值之下 </option>
+                        <option value="range" id="range"> 范围 </option>
+                        <option value="percentage" id="percentage"> 百分比 </option>
+                    </select>
+                    <div id="range_options" style="display: none;">
+                        <div>
+                            最小值: <input type="number" name="min_value" id="min_range_value">
+                        </div>
+                        <div>
+                            最大值: <input type="number" name="max_value" id="max_range_value">
+                            <input type="button" value="OK" id="set_range">
+                        </div>
+                    </div>
+                    <div id="percentage_options" style="display: none;">
+                        <select name="select_percentage" id="select_percentage">
+                            <option value="100" selected> 前100% </option>
+                            <option value="80"> 前80% </option>
+                            <option value="60"> 前60% </option>
+                            <option value="40"> 前40% </option>
+                            <option value="20"> 前20% </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="canvas_zoom">
+        <label for="zoom_">缩放：</label>
+        <input type="range" name="zoom_" id="zoom_" min="0.5" max="3" value="1" step="0.25">
+
+    </div>
+
+
+    <script type="text/javascript" src="chartTrial.js">
+        var canvas = document.getElementById('myCanvas');
+        var ctx = canvas.getContext('2d');
+    </script>
+</body>
+
+</html>
