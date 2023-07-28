@@ -14,14 +14,17 @@
     <div class="flex">
         <div class="inputBox">
             <div class="title"> 新增数据 </div>
-            <div class="spaceRow"></div>
-            <div><input type="text" id="input_year" placeholder="年份"></div>
-            <div><input type="number" id="input_value" placeholder="产量"></div>
-            <div>
-                <button id="insert" value="添加" onclick="addDataToTable()"> 添加 </button>
-                <button id="get_chart" value="生成图表" onclick="getChart()"> 生成图表 </button>
-                <button id="clear_data" value=" 清空表单数据" onclick="clearTable()"> 清空表单数据 </button>
+            <div id="inputBox_content">
+                <div class="spaceRow"></div>
+                <div><input type="text" id="input_year" placeholder="年份"></div>
+                <div><input type="number" id="input_value" placeholder="产量"></div>
+                <div>
+                    <button id="insert" value="添加" onclick="addDataToTable()"> 添加 </button>
+                    <button id="get_chart" value="生成图表" onclick="getChart()"> 生成图表 </button>
+                    <button id="clear_data" value=" 清空表单数据" onclick="clearTable()"> 清空表单数据 </button>
+                </div>
             </div>
+
         </div>
 
         <div class="histogramSetting moveLeft17">
@@ -131,7 +134,7 @@
                     </div>
                     <div class="width">
                         <label for="font_size">字体大小：</label>
-                        <input type="range" name="font_size" id="font_size" min="10" max="25" value="18"
+                        <input type="range" name="font_size" id="font_size" min="10" max="40" value="18"
                             class="rangeWidth">
                     </div>
                 </div>
@@ -139,6 +142,7 @@
         </div>
 
         <div class="moveLeft17">
+
             <div class="valueOrderSetting">
                 <div class="title"> 产量排序设置 </div>
                 <div class="flex">
@@ -183,7 +187,7 @@
 
     <div class="flex">
         <!-- 表格那栏 -->
-        <div>
+        <div id="data_table">
             <table>
                 <thead>
                     <tr>
@@ -198,17 +202,18 @@
 
         <div class="moveLeft17">
             <div class="flex">
-                <div class=" width110">
+                <div class=" width110 hide_histogram_option">
                     <input type="checkbox" name="hide_histogram" id="hide_histogram">
                     <label for="hide_histogram"> 隐藏柱状图 </label>
                 </div>
-                <div class="width110">
+                <div class="width110 hide_line_chart_option">
                     <input type="checkbox" name="hide_line_chart" id="hide_line_chart">
                     <label for="hide_line_chart"> 隐藏折线图 </label>
                 </div>
             </div>
 
-            <div id="canvasContainer" style="width: 1000px; height: 600px;">
+            <div id="canvasContainer"
+                style="position: absolute; top: 220px; left: 268px; width: 1000px; height: 600px;">
                 <canvas id="myCanvas" width="1000" height="568"></canvas>
             </div>
         </div>
@@ -254,8 +259,13 @@
     <div class="canvas_zoom">
         <label for="zoom_">缩放：</label>
         <input type="range" name="zoom_" id="zoom_" min="0.5" max="3" value="1" step="0.25">
-
     </div>
+
+    <div id="other">
+        <div class="title">其他</div>
+    </div>
+
+    <input type="button" value="收起" id="hide_style_options">
 
     <script type="text/javascript" src="chartTrial.js">
         var canvas = document.getElementById('myCanvas');

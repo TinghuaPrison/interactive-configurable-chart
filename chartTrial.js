@@ -90,7 +90,7 @@ function insertionSort_descending(arr1, arr2) {
     return { Value: arr1, Year: arr2 };
 }
 
-function min(num1, num2) {
+function getMax(num1, num2) {
     return num1 > num2 ? num1 : num2;
 }
 
@@ -141,20 +141,16 @@ function count() {
     n = value.length;
     max = Math.max.apply(null, value);
     min = Math.min.apply(null, value);
-    //console.log("min: ", min, " max: ", max);
 
     var range = max - min;
     var tick_range = range / N_tick;
-    //console.log(tick_range);
 
     var digit = get_digits(tick_range);
     var temp = (tick_range / Math.pow(10, digit)).toFixed(3);
     var temp2 = get_round(temp);
     var new_tick_range = temp2 * Math.pow(10, digit);
 
-    //console.log(tick_range, "=>", new_tick_range);
     var new_lower = new_tick_range * Math.floor(min / new_tick_range);
-    //var new_upper = new_tick_range * Math.floor(1 + (max / new_tick_range));
 
     var new_upper = new_lower;
     //补多一个间隔以便折线图的美观
@@ -167,13 +163,12 @@ function count() {
         }
     }
 
-    console.log("lower: ", new_lower.toFixed(2), " upper: ", new_upper.toFixed(2), " tick: ", new_tick_range.toFixed(2));
-
     result = [new_lower.toFixed(2), new_upper.toFixed(2), new_tick_range.toFixed(2), N_tick];
     console.log(result);
     return result;
 }
 
+//刻度算法（使用）
 function count2() {
 
     n = value.length;   //数组长度
@@ -269,6 +264,8 @@ var first = true;
 var defaultCanvasWidth = 1000;
 var defaultCanvasHeight = 568;
 var zoomValue = 1;
+var canvasPositionTop = 220;
+var canvasPositionLeft = 268;
 
 //排序方式：0默认，1升序，2降序
 var order = {
@@ -370,8 +367,9 @@ function initial() {
 
     if (zoomValue) {
 
-        //重定位
+        //x轴重定位
         if (originPoint.x < yMarginLeft * zoomValue) {
+            console.log("x轴重定位");
             var xAxisOffset = yMarginLeft * zoomValue - originPoint.x;
             originPoint.x += xAxisOffset;
             xAxisEndPoint.x += xAxisOffset;
@@ -379,7 +377,8 @@ function initial() {
 
         //画布宽度调整
         if (canvas.width - xAxisEndPoint.x < 120 * zoomValue) {
-            canvas.width = xAxisEndPoint.x + (120 * zoomValue);
+            console.log("x画布宽度调整");
+            canvas.width = getMax(defaultCanvasWidth, xAxisEndPoint.x + (120 * zoomValue));
         }
 
     }
@@ -390,6 +389,7 @@ function initial() {
 
         //重定位
         if (yAxisEndPoint.y < yMarginTop * zoomValue) {
+            console.log("y轴重定位");
             var yAxisOffset = yMarginTop - yAxisEndPoint.y;
             originPoint.y += yAxisOffset;
             yAxisEndPoint.y += yAxisOffset;
@@ -397,6 +397,7 @@ function initial() {
 
         //画布高度调整
         if (canvas.height - yAxisEndPoint.y < 100 * zoomValue) {
+            console.log("y画布高度调整");
             canvas.height = yAxisEndPoint.y + (100 * zoomValue);
         }
     }
@@ -418,22 +419,27 @@ function resize() {
 
     //宽度超出 左右滑动条
     if (canvas.width > defaultCanvasWidth && canvas.height <= defaultCanvasHeight)
-        newCanvasContainerStyle = "width: 1000px; height: 568px; overflow-x: scroll;";
+        newCanvasContainerStyle = `position: absolute; top: ${canvasPositionTop}px; left: ${canvasPositionLeft}px; width: 1000px; height: 568px; overflow-x: scroll;`;
 
 
     //高度超出 上下滑动条
     else if (canvas.width <= defaultCanvasWidth && canvas.height > defaultCanvasHeight)
-        newCanvasContainerStyle = `width: ${canvas.width}px; height: 568px; overflow-y: scroll;`;
+        newCanvasContainerStyle = `position: absolute; top: ${canvasPositionTop}px; left: ${canvasPositionLeft}px; width: ${canvas.width}px; height:568px; overflow-y: scroll;`;
 
 
     //宽度与高度都超出 上下左右滑动条
-    else if (canvas.width > defaultCanvasWidth && canvas.height > defaultCanvasHeight)
-        newCanvasContainerStyle = "width: 1000px; height: 568px; overflow-x: scroll; overflow-y: scroll;";
-
+    else if (canvas.width > defaultCanvasWidth && canvas.height > defaultCanvasHeight) {
+        console.log("宽度与高度都超出 上下左右滑动条");
+        newCanvasContainerStyle = `position: absolute; top: ${canvasPositionTop}px; left: ${canvasPositionLeft}px; width: 1000px; height: 568px; overflow-x: scroll; overflow-y: scroll;`;
+    }
 
     //没超出 不用滑动条
-    else
-        newCanvasContainerStyle = "width: 1000px; height: 568px;";
+    else {
+        newCanvasContainerStyle = `position: absolute; top: ${canvasPositionTop}px; left: ${canvasPositionLeft}px; width: 1000px; height: 568px;`;
+        canvas.height = 568;
+        canvas.width = 1000;
+
+    }
 
 
     canvasContainer.setAttribute("style", newCanvasContainerStyle);
@@ -964,8 +970,6 @@ async function histogram_style(_hide, solid, gradient, pattern, before) {
 //隐藏柱状图
 var hide_histogram = document.getElementById("hide_histogram");
 hide_histogram.onclick = function () {
-    //console.log(hide_histogram.checked);
-    //if (!show.histogram)
     hide.histogram = hide_histogram.checked;
     histogram_style(hide_histogram.checked, null, null, null, style_before);
 }
@@ -1617,6 +1621,143 @@ document.getElementById("select_percentage").addEventListener("input", function 
 // ==================================================
 // ==================================================
 
+//功能的显示与隐藏
+var optionsIsHide = false;
+var hide_style_options = document.getElementById("hide_style_options");
+hide_style_options.addEventListener("click", function () {
+
+    //隐藏
+    if (optionsIsHide == false) {
+
+        optionsIsHide = true;
+
+        this.setAttribute('style', 'top : 70px;');
+        this.value = "更多";
+
+        var title = document.getElementsByClassName("title");
+
+        title[0].setAttribute('style', 'width : 215px;');
+        title[1].setAttribute('style', 'width : 365px;');
+        title[2].setAttribute('style', 'width : 559px;');
+
+        var flex = document.getElementsByClassName("flex");
+
+        flex[1].setAttribute('style', 'display: none;');
+        flex[2].setAttribute('style', 'display: none;');
+
+
+        var inputBox_content = document.getElementById("inputBox_content");
+        inputBox_content.setAttribute('style', 'display: none;');
+
+        var lineGraphSetting = document.getElementsByClassName("lineGraphSetting");
+        lineGraphSetting[0].setAttribute('style', 'height : 45px;');
+
+        var histogramSetting = document.getElementsByClassName("histogramSetting")
+        histogramSetting[0].setAttribute('style', 'height : 45px;');
+
+        InputBox = document.querySelector(".inputBox");
+        InputBox.setAttribute('style', 'height : 45px;');
+
+
+        var hide_histogram_option = document.getElementsByClassName("hide_histogram_option");
+        hide_histogram_option[0].setAttribute('style', 'top: 70px');
+
+
+        var hide_line_chart_option = document.getElementsByClassName("hide_line_chart_option");
+        hide_line_chart_option[0].setAttribute('style', 'top: 70px');
+
+        var canvas_zoom = document.getElementsByClassName("canvas_zoom");
+        canvas_zoom[0].setAttribute('style', 'top: 70px');
+
+        var data_table = document.getElementById("data_table");
+        data_table.setAttribute('style', 'top: 70px');
+
+        var dataSetting = document.getElementsByClassName("dataSetting");
+        dataSetting[0].setAttribute('style', 'display: none;');
+
+        var yearOrderSetting = document.getElementsByClassName("yearOrderSetting");
+        yearOrderSetting[0].setAttribute('style', 'display: none;');
+
+        var valueOrderSetting = document.getElementsByClassName("valueOrderSetting");
+        valueOrderSetting[0].setAttribute('style', 'display: none;');
+
+        var other = document.getElementById("other");
+        other.setAttribute('style', 'display: block;')
+
+        var all_data = document.querySelectorAll("table tr");
+
+        canvasPositionTop = 100;
+
+        if (all_data.length == 1) {
+            var canvasContainer = document.getElementById('canvasContainer');
+            var newCanvasContainerStyle = `position: absolute; top: ${canvasPositionTop}px; left: ${canvasPositionLeft}px; width: 1000px; height: 568px;`;
+            canvasContainer.setAttribute("style", newCanvasContainerStyle);
+        }
+    }
+
+    //显示
+    else {
+        optionsIsHide = false;
+
+        this.setAttribute('style', 'top : 185px;');
+        this.value = "收起";
+
+        var flex = document.getElementsByClassName("flex");
+        flex[1].setAttribute('style', 'display: flex;');
+        flex[2].setAttribute('style', 'display: flex;');
+
+
+        var inputBox_content = document.getElementById("inputBox_content");
+        inputBox_content.setAttribute('style', 'display: block;');
+
+
+        var lineGraphSetting = document.getElementsByClassName("lineGraphSetting");
+        lineGraphSetting[0].setAttribute('style', 'height : 160px;');
+
+        var histogramSetting = document.getElementsByClassName("histogramSetting")
+        histogramSetting[0].setAttribute('style', 'height : 160px;');
+
+        InputBox = document.querySelector(".inputBox");
+        InputBox.setAttribute('style', 'height : 160px;');
+
+        var hide_histogram_option = document.getElementsByClassName("hide_histogram_option");
+        hide_histogram_option[0].setAttribute('style', 'top: 190px');
+
+        var hide_line_chart_option = document.getElementsByClassName("hide_line_chart_option");
+        hide_line_chart_option[0].setAttribute('style', 'top: 190px');
+
+        var canvas_zoom = document.getElementsByClassName("canvas_zoom");
+        canvas_zoom[0].setAttribute('style', 'top: 190px');
+
+        var data_table = document.getElementById("data_table");
+        data_table.setAttribute('style', 'top: 190px');
+
+        var dataSetting = document.getElementsByClassName("dataSetting");
+        dataSetting[0].setAttribute('style', 'display: block;');
+
+        var yearOrderSetting = document.getElementsByClassName("yearOrderSetting");
+        yearOrderSetting[0].setAttribute('style', 'display: block;');
+
+        var valueOrderSetting = document.getElementsByClassName("valueOrderSetting");
+        valueOrderSetting[0].setAttribute('style', 'display: block;');
+
+        var other = document.getElementById("other");
+        other.setAttribute('style', 'display: none;')
+
+        canvasPositionTop = 220;
+
+        var all_data = document.querySelectorAll("table tr");
+        if (all_data.length == 1) {
+            var canvasContainer = document.getElementById('canvasContainer');
+            var newCanvasContainerStyle = `position: absolute; top: ${canvasPositionTop}px; left: ${canvasPositionLeft}px; width: 1000px; height: 568px;`;
+            canvasContainer.setAttribute("style", newCanvasContainerStyle);
+        }
+    }
+
+    mainFunc();
+});
+
+
 // 将有效输入数据添加到表单中
 function addDataToTable() {
     // 从输入框中获取输入的数据
@@ -1633,19 +1774,18 @@ function addDataToTable() {
 
     // 创建年份单元格
     var tdYear = document.createElement("td");
-    var textYear = document.createTextNode(curInputYear);
-    tdYear.appendChild(textYear);
+    tdYear.innerHTML = `<input type="number" value=${curInputYear} min="0" style="width: 50px;">`;
 
     // 创建产量单元格
     var tdProduction = document.createElement("td");
-    var textProduction = document.createTextNode(curInputProduction);
-    tdProduction.appendChild(textProduction);
+    tdProduction.innerHTML = `<input type="number" value=${curInputProduction} min="0" style="width: 60px;">`;
 
     // 创建操作单元格
     var tdA = document.createElement("td");
     var eleA = document.createElement("a");
     eleA.setAttribute("href", "javascript:void(0);");
     eleA.setAttribute("onclick", "deleteTr(this);");
+
     var textA = document.createTextNode("删除");
     eleA.appendChild(textA);
     tdA.appendChild(eleA);
@@ -1658,7 +1798,15 @@ function addDataToTable() {
 
     var table = document.getElementsByTagName("table")[0];
     table.appendChild(tr);
+
+    //表格添加滑动条
+    var all_data = document.querySelectorAll('tr input');
+    var table2 = document.getElementById('data_table');
+    if (all_data.length > 44)
+        table2.setAttribute("style", "overflow-y: scroll;");
+
 }
+
 
 // 删除单行输入数据
 function deleteTr(obj) {
@@ -1667,6 +1815,13 @@ function deleteTr(obj) {
     var tr = obj.parentNode.parentNode;
     // 删除（并返回）当前节点的指定子节点。
     table.removeChild(tr);
+
+    var all_data = document.querySelectorAll('tr input');
+    var table2 = document.getElementById('data_table');
+    if (all_data.length <= 44) {
+
+        table2.setAttribute("style", "overflow-y: none;");
+    }
 }
 
 // 清空表单数据
@@ -1748,6 +1903,8 @@ restoreData();
 //产量年份排序与数据过滤选项设定复原
 function resetDataOrderFilterOptions() {
 
+    console.log("reset");
+
     var dataFilteringOptions = document.getElementById("data_filtering");
     dataFilteringOptions.value = "none";
 
@@ -1762,28 +1919,46 @@ function resetDataOrderFilterOptions() {
     order.year = order.value = 0
 }
 
+//从表格获取数据
+function getData() {
+
+    var all_data = document.querySelectorAll('tr input');
+    var newYear = [];
+    var newValue = [];
+
+    if (all_data.length == 0)
+        return false;
+
+    for (var i = 0; i < all_data.length; i++) {
+
+        if (all_data[i].value < 0 || all_data[i].value == "") {
+
+            //alert("error");
+            return false;
+        }
+
+        //年份
+        if (i % 2 == 0)
+            newYear.push(all_data[i].value);
+        //产量
+        else
+            newValue.push(all_data[i].value);
+
+    }
+
+    year = newYear;
+    value = newValue;
+
+    return true;
+}
+
 //获取图表
 function getChart() {
 
     resetDataOrderFilterOptions();
 
-    var all_data = document.querySelectorAll('tr');
-
-    //只有标题，没有元素
-    if (all_data.length <= 1) {
-        alert("数据为空，无法生成图表，请添加数据！");
+    if (getData() == false)
         return;
-    }
-
-    var year = new Array();
-    var value = new Array();
-
-    for (var i = 1; i < all_data.length; i++) {
-
-        var chart_data = all_data[i].querySelectorAll('td');
-        year.push(chart_data[0].innerText);
-        value.push(chart_data[1].innerText);
-    }
 
     console.log(year);
     console.log(value);
@@ -1796,3 +1971,4 @@ function getChart() {
     initial();
     mainFunc();
 }
+
