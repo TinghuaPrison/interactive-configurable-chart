@@ -48,6 +48,11 @@
     width: 77px;
 }
 
+.hide_histogram_option {
+    position: absolute;
+    left: 268px;
+}
+
 /* =============== 折线图设置 =============== */
 .lineGraphSetting {
     padding: 5px 15px;
@@ -62,6 +67,11 @@
 
 .rangeWidth {
     width: 85px;
+}
+
+.hide_line_chart_option {
+    position: absolute;
+    left: 380px;
 }
 
 /* =============== 排序设置 =============== */
@@ -88,6 +98,12 @@
 }
 
 /* =============== 表格样式 =============== */
+#data_table {
+    position: absolute;
+    width: 246px;
+    height: 586px;
+}
+
 table {
     width: 246px;
     border-collapse: collapse;
@@ -204,15 +220,10 @@ body {
     background-size: 1200px 900px;
 }
 
+/* =============== 其他 =============== */
 a {
     text-decoration: none;
     color: #333;
-}
-
-#data_table {
-    position: absolute;
-    width: 246px;
-    height: 586px;
 }
 
 #hide_style_options {
@@ -225,15 +236,6 @@ a {
     border-radius: 5px;
 }
 
-.hide_histogram_option {
-    position: absolute;
-    left: 268px;
-}
-
-.hide_line_chart_option {
-    position: absolute;
-    left: 380px;
-}
 
 #other {
     display: none;
@@ -250,5 +252,4 @@ a {
 
 .other>.title {
     position: absolute;
-    /*  top: 13px; */
 }

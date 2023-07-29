@@ -241,7 +241,6 @@ var xAxisEndPoint = {
     y: 0
 };
 
-
 //关于y轴
 var tickRangeHeight = 50;   //Y轴间隔的高度（不是值）
 var yMarginTop = 150;       //Y轴（箭头端）与顶部的距离
@@ -278,7 +277,6 @@ var hide = {
     histogram: false,   //柱状图
     line: false         //折线图
 };
-
 
 //保存柱状图之前的样式
 var style_before = {
@@ -381,7 +379,6 @@ function initial() {
 
     }
 
-
     //重定位y轴与调整高度
     if (zoomValue != 1) {
 
@@ -401,7 +398,6 @@ function initial() {
     }
 
     canvas.height = originPoint.y + 100;
-
 
     //可能需要添加滑动条
     resize();
@@ -970,11 +966,13 @@ hideHistogram.onclick = function () {
 var dimensionOptions = document.getElementById("histrogram_dimension");
 dimensionOptions.addEventListener("change", function () {
 
+    //三维 立体
     if (dimensionOptions.value == "3D") {
         histogramDimension = 3;
         style_before.dimension = 3;
     }
 
+    //二维 平面
     else if (dimensionOptions.value == "2D") {
         histogramDimension = 2;
         style_before.dimension = 2;
@@ -1281,8 +1279,6 @@ function setBackground() {
     });
 }
 
-
-
 //https://cloud.tencent.com/developer/article/1665737
 //主程序
 async function mainFunc() {
@@ -1463,7 +1459,6 @@ dataFileringOptions.addEventListener("click", function () {
         document.getElementById("range_options").style.display = "none";
         document.getElementById("percentage_options").style.display = "none";
         dataFileringOptions.value = "none";
-
         return;
     }
 
@@ -1471,7 +1466,6 @@ dataFileringOptions.addEventListener("click", function () {
     if (type == "none") {
         dataFilterType.default = true;
         filterMark = null;
-        //return;
     }
 
     else if (type == "above_avg" || type == "below_avg") {
@@ -1592,6 +1586,7 @@ rangeOptionsInputs[2].addEventListener("click", function () {
     }
 });
 
+//设置百分比过滤
 document.getElementById("select_percentage").addEventListener("input", function () {
     document.getElementById("percentage_options").style.display = "none";
     var percentage = document.getElementById("select_percentage").value;
@@ -1638,16 +1633,13 @@ hideStyleOptions.addEventListener("click", function () {
         this.value = "更多";
 
         var title = document.getElementsByClassName("title");
-
         title[0].setAttribute('style', 'width : 215px;');
         title[1].setAttribute('style', 'width : 365px;');
         title[2].setAttribute('style', 'width : 559px;');
 
         var flex = document.getElementsByClassName("flex");
-
         flex[1].setAttribute('style', 'display: none;');
         flex[2].setAttribute('style', 'display: none;');
-
 
         var inputBox_content = document.getElementById("inputBox_content");
         inputBox_content.setAttribute('style', 'display: none;');
@@ -1664,7 +1656,6 @@ hideStyleOptions.addEventListener("click", function () {
 
         var hideHistogram_option = document.getElementsByClassName("hide_histogram_option");
         hideHistogram_option[0].setAttribute('style', 'top: 70px');
-
 
         var hide_line_chart_option = document.getElementsByClassName("hide_line_chart_option");
         hide_line_chart_option[0].setAttribute('style', 'top: 70px');
@@ -1712,7 +1703,6 @@ hideStyleOptions.addEventListener("click", function () {
 
         var inputBox_content = document.getElementById("inputBox_content");
         inputBox_content.setAttribute('style', 'display: block;');
-
 
         var lineGraphSetting = document.getElementsByClassName("lineGraphSetting");
         lineGraphSetting[0].setAttribute('style', 'height : 160px;');
@@ -1932,9 +1922,8 @@ function getData() {
 
     for (var i = 0; i < all_data.length; i++) {
 
+        //某一行的数据项为负值或为空
         if (all_data[i].value < 0 || all_data[i].value == "") {
-
-            //alert("error");
             return false;
         }
 
